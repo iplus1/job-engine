@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>This is the Job-Engine Tool Page</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block 'header-extras' %}{% endblock %}
+    {% load static %}
+    <link href="{% static 'bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet">
+    <link href="{% static 'tabulator-tables/dist/css/tabulator.min.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% block 'body' %}{% endblock %}
+    <script src="{% static 'js/jquery-1.11.1-min.js' %}"></script>
+    <script src="{% static 'tabulator-tables/dist/js/tabulator.min.js' %}"></script>
+    <script src="{% static 'js/js.cookie.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/helper_functions.js' %}"></script>
+    <script src="{% static 'js/table_handler.js' %}"></script>
+    <script src="{% static 'js/requests.js' %}"></script>
+    <script src="{% static 'js/gui.js' %}"></script>
+    <script src="{% static 'js/event_handler.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>
+
