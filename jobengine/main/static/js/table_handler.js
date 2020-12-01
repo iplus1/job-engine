@@ -1,23 +1,174 @@
+/**
+ * Handle the onClick event of the cells in the job.table.
+ *
+ * Display the information of the cell in a help modal.
+ *
+ * @param cell: Expects a cell-object of the job-table.
+ */
+on_cell_click = function (cell) {
+    const help_modal = document.querySelector("#help_modal");
+    const title = `Job ${cell.getColumn().getDefinition().title}`;
+    let body_value = cell.getValue();
+    if (title.includes('Status')) {
+        if (cell.getValue() === null) {
+            body_value = 'Waiting on Execution...';
+        } else if (cell.getValue() === 137) {
+            body_value = `Return Code: ${cell.getValue()} Process has been stopped.`;
+        } else {
+            body_value = `Return Code: ${cell.getValue()}`;
+        }
+    } else if (title === 'Job Running') {
+        if (cell.getValue() === true) {
+            body_value = 'Yes';
+        } else {
+            body_value = 'No';
+        }
+    } else {
+        if (cell.getValue() === null) {
+            body_value = 'No Data Available.';
+        }
+    }
+    let body = `<pre>${body_value}</pre>`;
+    fill_help_modal(title, body);
+    show_element(help_modal);
+}
 
+/**
+ * Returns the Tabulator object of the job-table.
+ *
+ * Contains the definition for the job-table.
+ *
+ * @returns {Tabulator}
+ */
 function job_table() {
-    return new Tabulator('#jobtable', {
+    return new Tabulator('#job_table', {
         layout: 'fitDataStretch',
         placeholder: 'No Data Received',
         ajaxURL: 'get_jobs/',
         ajaxLoader: false,
         pagination: 'local',
-        paginationSize: 6,
+        paginationSize: 14,
+        tooltips: true,
         columns: [
-            {title: 'Name', field: 'name', width: 128},
-            {title: 'Mode', field: 'mode', width: 128},
-            {title: 'Crontab', field: 'cron_string', widthGrow: 1},
-            {title: 'Optional Parameters', field: 'optional_params', width:256},
-            {title: 'Running', field: 'running', widthGrow: 1},
-            {title: 'Status', field: 'status', widthGrow: 1},
-            {title: 'Date', field: 'date', widthGrow: 2},
-            {title: 'Control Panel', field: 'control', width: 64, formatter: (cell) => {
-                return generate_control(cell.getRow().getData())
-                }},
-            ]
-    })
+            {
+                title: 'Name',
+                field: 'name',
+                width: 110,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Mode',
+                field: 'mode',
+                width: 90,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Crontab',
+                field: 'cron_string',
+                width: 90,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Command',
+                field: 'command',
+                width: 280,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Ipynb Path',
+                field: 'ipynb_file',
+                width: 140,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Running',
+                field: 'running',
+                width: 100,
+                cellClick: (e, cell) => on_cell_click(cell),
+                formatter: (cell) => {
+                    if (cell.getValue() === true) {
+                        return 'Yes';
+                    } else {
+                        return 'No';
+                    }
+                }
+            },
+            {
+                title: 'L. Status',
+                field: 'last_status',
+                hozAlign: "center",
+                width: 115,
+                cellClick: (e, cell) => on_cell_click(cell),
+                titleFormatter: (element) => {
+                    return `${element.getValue()}  <a href="#" onclick="get_help('status_help_holder')">
+                            <span class="glyphicon glyphicon-question-sign"></span></a></label>`;
+                },
+                formatter: (cell) => {
+                    return status_button(cell.getValue());
+                },
+                tooltip: function (cell) {
+                    if (cell.getValue() === null) {
+                        return 'Waiting on Execution...';
+                    } else if (cell.getValue() === 137) {
+                        return 'Return Code: 137 Process has been stopped.';
+                    } else {
+                        return `Return Code: ${cell.getValue()}`;
+                    }
+                }
+            },
+            {
+                title: 'C. Status',
+                field: 'current_status',
+                hozAlign: "center",
+                width: 115,
+                cellClick: (e, cell) => on_cell_click(cell),
+                titleFormatter: (element) => {
+                    return `${element.getValue()}  <a href="#" onclick="get_help('status_help_holder')">
+                            <span class="glyphicon glyphicon-question-sign"></span></a></label>`;
+                },
+                formatter: (cell) => {
+                    return status_button(cell.getValue());
+                },
+                tooltip: function (cell) {
+                    if (cell.getValue() === null) {
+                        return 'Waiting on Execution...';
+                    } else if (cell.getValue() === 137) {
+                        return 'Return Code: 137 Process has been stopped.';
+                    } else {
+                        return `Return Code: ${cell.getValue()}`;
+                    }
+                }
+            },
+            {
+                title: 'Output',
+                field: 'output',
+                width: 90,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Start Date',
+                field: 'start_date',
+                width: 140,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'End Date',
+                field: 'end_date',
+                width: 140,
+                cellClick: (e, cell) => on_cell_click(cell)
+            },
+            {
+                title: 'Control Panel',
+                field: 'control',
+                titleFormatter: (element) => {
+                    return `${element.getValue()}  <a href="#" onclick="get_help('control_help_holder')">
+                            <span class="glyphicon glyphicon-question-sign"></span></a></label>`;
+                },
+                formatter: (cell) => {
+                    return generate_control(cell.getRow().getData());
+                }
+            },
+        ]
+    });
 }
+

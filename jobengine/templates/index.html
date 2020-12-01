@@ -6,51 +6,243 @@
         <h1>Job-Engine</h1>
         <br>
         <br>
+        <!-- Tabulator Table -->
         <div class="panel panel-default">
-            <div class="panel-heading">Job Table</div>
-            <div id="jobtable"></div>
+            <div class="panel-heading">
+                <div class="job-table-header">
+                    <span><button id="add_job-btn" class="btn btn-primary">+</button></span>
+                </div>
+            </div>
+            <div id="job_table"></div>
         </div>
 
         <br>
         <br>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">New Job</div>
-            <div class="panel-body">
-                <form id="jobform" action="create_job" class="form-horizontal" name="jobform">
-                    <div class="form-group">
-                        <label for="job_name" class="control-label col-sm-3">Name:</label>
-                        <div class="col-sm-4">
-                            <input type="text" name="job_name" id="job_name" class="form-control" value="">
-                        </div>
+        <!-- Create Modal -->
+        <div id="create_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
+            <div id="create_modal-dialog" class="modal-dialog" role="dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="create_modal-title" class="modal-title">New Job</h3>
+                        <button type="button" class="close" aria-label="Close">
+                            <span id="create_modal-tic" aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label for="mode" class="control-label col-sm-3">Mode Selection:</label>
-                        <div class="col-sm-4">
-                            <select name="mode" id="mode" size="1" class="form-control  mb-2 mr-sm-2 mb-sm-0">
-                                <option value="cron">cron</option>
-                                <option value="cmd">cmd</option>
-                            </select>
-                        </div>
+                    <div id="create_modal-body" class="modal-body">
+                        <form id="job_form" action="create_job" class="form-horizontal" name="jobform">
+                            <div class="form-group">
+                                <label for="job_name" class="control-label col-sm-3">Name:</label>
+                                <div class="col-sm-3">
+                                    <input type="text" name="job_name" id="job_name" class="form-control" value="">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="mode" class="control-label col-sm-3">Mode Selection: <a href="#"
+                                                                                                    onclick="get_help('mode_help_holder')"><span
+                                        class="glyphicon glyphicon-question-sign"></span></a></label>
+                                <div class="col-sm-2">
+                                    <select name="mode" id="mode" size="1" class="form-control  mb-2 mr-sm-2 mb-sm-0">
+                                        <option value="cron">cron</option>
+                                        <option value="cmd">cmd</option>
+                                        <option value="cron ipynb">cron ipynb</option>
+                                        <option value="cmd ipynb">cmd ipynb</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" id="ipynbfiles" style="display: none;">
+                                <label for="ipynb_file" class="control-label col-sm-3">Jupyter Notebook:</label>
+                                <div class="col-sm-6">
+                                    <select name="ipynb_file" id="ipynb_file" size="1" class="form-control">
+                                        <option> -- select an ipynb --</option>
+                                        {% for nb in nbs %}
+                                            <option>{{ nb }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" id="cronstring">
+                                <label for="cron_string" class="control-label col-sm-3">Cron String: <a href="#"
+                                                                                                        onclick="get_help('cron_help_holder')"><span
+                                        class="glyphicon glyphicon-question-sign"></span></a></label>
+                                <div class="col-sm-2">
+                                    <input type="text" name="cron_string" id="cron_string"
+                                           class="form-control  mb-2 mr-sm-2 mb-sm-0" maxlength="30" value="* * * * *">
+                                </div>
+                            </div>
+                            <div class="form-group" id="command_div">
+                                <label for="command" class="control-label col-sm-3">Command: </label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="command" id="command"
+                                           class="form-control  mb-2 mr-sm-2 mb-sm-0" value="">
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-group" id="cronstring">
-                        <label for="cron_string" class="control-label col-sm-3">Cron String: </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="cron_string" id="cron_string"
-                                   class="form-control  mb-2 mr-sm-2 mb-sm-0" maxlength="30" value="* * * * *">
-                        </div>
+                    <div class="modal-footer">
+                        <button id="submit_create" type="submit" form="job_form"
+                                class="close-modal btn btn-primary notification_modal-ok">Create
+                        </button>
+                        <button id="create_modal-close" type="button"
+                                class="close-modal btn btn-secondary notification_modal-close" data-dismiss="modal">
+                            Close
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label for="optional_params" class="control-label col-sm-3">Optional Parameter: </label>
-                        <div class="col-sm-4">
-                            <input type="text" name="optional_params" id="optional_params"
-                                   class="form-control  mb-2 mr-sm-2 mb-sm-0" value="">
-                        </div>
-                    </div>
-                    <button id="submit_create" value='Submit form' class="btn btn-default">Create</button>
-                </form>
+                </div>
             </div>
         </div>
+
+
+        <!-- Create Panel -->
+        <div class="panel panel-default" style="display: none">
+            <div class="panel-heading"><h4>New Job</h4></div>
+            <div class="panel-body">
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notification_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
+        <div class="modal-dialog" role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="notification_modal-title" class="modal-title">Notification</h3>
+                    <button type="button" class="close" aria-label="Close">
+                        <span id="notification_modal-tic" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="notification_modal-body" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button id="notification_modal-ok" type="button"
+                            class="close-modal btn btn-primary notification_modal-ok">Confirm
+                    </button>
+                    <button id="notification_modal-close" type="button"
+                            class="close-modal btn btn-secondary notification_modal-close" data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
+        <div id="help_modal-dialog" class="modal-dialog" role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="help_modal-title" class="modal-title">Help</h3>
+                    <button type="button" class="close" aria-label="Close">
+                        <span id="help_modal-tic" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="help_modal-body" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button id="help_modal-close" type="button"
+                            class="close-modal btn btn-secondary notification_modal-close" data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Content Cron -->
+    <div id="cron_help_holder" style="display:none;">
+        There are two options for running a jupyter notebook:
+        <b>command</b>
+        and
+        <b>cron job</b>
+        .
+        <b>command</b>
+        means that the selected notebook is started only once, which makes sense, e.g., for streaming jobs that run
+        continuously. The developer/notebook has to make sure that the command prints status information etc. to STDOUT
+        or an external data source where it can be captured. STDOUT is accessible via the output buttons. Please note
+        that it is not possible to use inline tags in the notebook cells, because the .ipynb is exported to a .py.<br>
+        <b>cron job</b>
+        executes the notebook regularly. This is similar to starting the whole notebook in the Jupyter IDE. The output
+        is written to an html that can be accessed via the output buttons. Create a cron string as follows:
+        <pre>
+     ┌───────────── minute (0 - 59)
+     │ ┌───────────── hour (0 - 23)
+     │ │ ┌───────────── day of month (1 - 31)
+     │ │ │ ┌───────────── month (1 - 12)
+     │ │ │ │ ┌───────────── day of week (0 - 6) (Sunday to Saturday;
+     │ │ │ │ │                                       7 is also Sunday)
+     │ │ │ │ │
+     │ │ │ │ │
+     * * * * *
+    </pre>
+        More on this: <a href="https://en.wikipedia.org/wiki/Cron">Wikipedia Article</a>.
+    </div>
+
+    <!-- Help Content Status -->
+    <div id="status_help_holder" style="display: none;">
+        <p>The Status columns reflect the status of the job by displaying the Return Code of the job <br>
+            or that the job is currently waiting to be completed.</p>
+        <p>The first status column stores the status of the last execution of the job. (L. = Last)<br>
+            While the second status column stores the status of the current execution. (C. = Current)
+        </p>
+        <p>To easily distinguish the three cases the Return Code gets displayed by either a green, <br>
+            yellow or red circle. To see the Return Code hover or click the status cell of the job. <br>
+            <br>
+            <b>Status Description:</b>
+        </p>
+        <br>
+        <pre>
+ <input type="button" class="btn btn-success btn-circle btn-sm"/> : Job execution successful - Return code 0.
+
+ <input type="button" class="btn btn-warning btn-circle btn-sm"/> : Job is waiting to complete its execution.
+
+ <input type="button" class="btn btn-danger btn-circle btn-sm"/> : Job execution failed - Return Code greater then 0.
+        </pre>
+    </div>
+
+    <!-- Help Content Control -->
+    <div id="control_help_holder" style="display: none;">
+        <p>The control panel contains multiple buttons to perform certain actions on the job. <br>
+            Depending on the Mode of the job the buttons displayed may differ.<br>
+            <br>
+            <b>Button Description:</b>
+        </p>
+        <br>
+        <pre>
+ <input type="button" class="btn btn-success btn-xs" value="Start">     : Start the execution of a job.
+
+ <input type="button" class="btn btn-danger btn-xs" value="Stop">      : Stop the execution of a job.
+
+ <input type="button" class="btn btn-info btn-xs" value="Cleanup">   : Cleanup the job directory by deleting all logfiles.
+
+ <input type="button" class="btn btn-info btn-xs" value="Update">    : To make sure the user can still work on an ipynb while a job is running,
+              the Jobengine uses a copy of the source script to execute for the job.
+              The Update function updates the script the Job is using.
+
+ <input type="button" class="btn btn-info btn-xs" value="Logs">      : Show all available log files of a job.
+
+ <input type="button" class="btn btn-danger btn-xs" value="Delete">    : Delete a job and every associated (Crontab, Directory, Process).
+    </pre>
+    </div>
+
+    <!-- Help Content Mode -->
+    <div id="mode_help_holder" style="display: none;">
+        The <b>mode</b> of a job defines the conditions and the environment it gets executed in.<br>
+        There are four modes a job can be executed in. <br>
+        <br>
+        <h4><b>Main differences:</b></h4><br>
+        <b>cron and cmd:</b> Both execute a specified command either through cron or directly in the shell.<br>
+        <b>ipynb:</b> Requires an <i>IPython Notebook</i> that will get converted and executed through a series of
+        commands.<br>
+        <br>
+        <h4><b>Mode Description:</b></h4>
+        <br>
+        <pre>
+ <b>cron:</b> The specified <b>command</b> will be executed as a Cron-Job in a set interval defined by the <b>Cron String</b>.
+
+ <b>cmd:</b> The specified <b>command</b> will be executed once.
+
+ <b>cron ipynb:</b> The specified <b>ipynb</b> will be executed as a Cron-Job in a set interval defined by the <b>Cron String</b>.
+
+ <b>cmd ipynb:</b> The specified <b>ipynb</b> will be executed once.
+        </pre>
     </div>
 
 {% endblock 'body' %}

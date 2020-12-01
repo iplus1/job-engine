@@ -1,0 +1,7 @@
+<select name="log_file" id="log_file" size="1" class="form-control">
+    <option> -- select a log --</option>
+    {% for log in logs %}
+        <option>{{ log }}</option>
+    {% endfor %}
+</select>
+

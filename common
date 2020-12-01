@@ -1,0 +1,30 @@
+#!/bin/bash
+
+info() {
+    local L_MSG=$1
+    TIMESTAMP=$(date +"[%Y-%m-%d %H:%M:%S]")
+    if [ "${L_MSG:0:1}" != '[' ]; then
+        L_MSG=" ${L_MSG}"
+    fi
+    echo "${TIMESTAMP}[INFO][$(basename "$0")]${L_MSG}"
+}
+error() {
+    local L_MSG=$1
+    local L_RC=$2
+    local L_KILL_CONTAINER=$3
+    TIMESTAMP=$(date +"[%Y-%m-%d %H:%M:%S]")
+    if [ "${L_MSG:0:1}" != '[' ]; then
+        L_MSG=" ${L_MSG}"
+    fi
+    echo "${TIMESTAMP}[ERROR][$(basename "$0")]${L_MSG}"
+    if [ -z "${L_RC}" ]; then
+        L_RC=1
+    fi
+    if [ "${L_KILL_CONTAINER}" = "KILL_CONTAINER" ]; then
+        echo "${TIMESTAMP}[ERROR][$(basename "$0")] Killing container!"
+        kill 1
+        pkill supervisord
+    fi
+    exit ${L_RC}
+}
+

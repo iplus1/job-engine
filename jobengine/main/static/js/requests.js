@@ -1,17 +1,29 @@
+/**
+ * Handle all request related functions.
+ */
 
-
-function handle_network_errors (response) {
-     if (!response.ok) {
-        throw Error(response.statusText);
+/**
+ * Handles unexpected network behavior like 404, 403.
+ * @param response
+ * @returns {response | Error}
+ */
+function error_handling(response) {
+    if (response.ok) {
+        return response
+    } else {
+        throw new Error(`Unexpected network behavior with Status: ${response.status}`)
     }
-    return response;
 }
 
-
-function create_job(e) {
-    e.preventDefault();
-    const url = e.currentTarget.action;
-    const data = Object.fromEntries(new FormData(e.target))
+/**
+ * Make a request to create a job.
+ *
+ * Update the job-table immediately afterwards.
+ *
+ * @param data: Expects an object containing the data of the create-form.
+ * @param url: Expects the url for the create request.
+ */
+function create_job(data, url) {
     const csrftoken = getCookie('csrftoken');
     fetch(url, {
         method: 'POST',
@@ -21,41 +33,86 @@ function create_job(e) {
             'X-CSRFToken': csrftoken
         },
         body: JSON.stringify(data)
-    }).then(function (response) {
-		if (response.ok) {
-			return response.json();
-		}
-		return Promise.reject(response);
-	}).then(function (data) {
-		console.log(data);
-	}).catch(function (error) {
-		console.warn(error);
-	});
+    })
+        .then(error_handling)
+        .then(response => response.text())
+        .then(function (response) {
+            display_after_control(response);
+        })
+        .catch(function (error) {
+            display_after_error(error);
+        });
 }
 
+/**
+ * Make a request to perform a specified action for a specified job.
+ *
+ * If the action was specified for 'logs' display a selection of log-files linked to the job.
+ *
+ * @param action: Expects a string specifying the action to be performed on the job.
+ * @param id: Expects an integer with the id of the job.
+ */
 function control_job(action, id) {
-        console.log(`control_job ${id} ${action}`);
-        const data = {
-            action: action,
-            id: id
-        };
-        let msg = `Do you really want to ${action} the job?`;
-
-        if (action === "delete") {
-            msg = "Do you really want to delete the job? This also deletes the Job history!"
-        }
-        const csrftoken = getCookie('csrftoken');
-        fetch('control_job/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=UTF-8',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify(data)
+    const data = {
+        action: action,
+        id: id
+    };
+    const csrftoken = getCookie('csrftoken');
+    fetch('control_job/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify(data)
+    })
+        .then(error_handling)
+        .then(response => response.text())
+        .then(async function (response) {
+            if (action !== 'logs') {
+                display_after_control(response);
+            } else {
+                await display_after_logs(response, id);
+            }
         })
-            .then(response => response.text())
-            .then(text => console.log(text))
-            .catch(error => console.log(error));
+        .catch(function (error) {
+            display_after_error(error);
+        });
+}
 
+/**
+ * Update the table-data in a set interval via the Sleep function.
+ *
+ */
+async function update_table() {
+    while (true) {
+        await fetch('get_jobs/', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(error_handling)
+            .then(response => response.json())
+            .then(function (response) {
+                Tabulator.prototype.findTable('#job_table')[0].replaceData(response);
+            })
+            .catch(function (error) {
+                display_after_error(error);
+            })
+            .finally(async () => {
+                await Sleep(2000)
+            });
+    }
+}
+
+/**
+ * Get a specific log file.
+ *
+ * @param id: Expects an integer with the id of the job.
+ * @param log_file: Expects the name of the specific log file to get.
+ */
+function get_log(id, log_file) {
+    window.open(`get_log?id=${id}&log_file=${encodeURIComponent(log_file)}`);
 }

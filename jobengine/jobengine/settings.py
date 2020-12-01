@@ -1,7 +1,11 @@
 import os
 from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '7ovi@=&!21@&4+dp2nqubjsx_!+wz5=k5ecu6gbi^fsyho)15x'
@@ -56,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'jobengine.wsgi.application'
 
-DBFILE='/glusterfs/test-max/jobengine/jobengine.sqlite3'
+DBFILE='/jobengine/db/jobengine.sqlite3'
 
 DATABASES = {
     'default': {
@@ -89,7 +93,5 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 STATIC_URL = '/jobengine/static/'
-
 STATIC_ROOT = '/var/www/jobengine/static'

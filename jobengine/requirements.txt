@@ -1,3 +1,4 @@
 Django==3.1.2
 uwsgi==2.0.19.1
 python-crontab==2.5.1
+psutil==5.7.3

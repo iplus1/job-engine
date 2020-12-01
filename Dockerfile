@@ -14,7 +14,13 @@ RUN bash -c "mkdir -p /var/www/jobengine/ && cd /var/www/jobengine/ && conda cre
 ADD jobengine /var/www/jobengine
 
 ADD start.sh /start.sh
+ADD wrapper.sh /jobengine/wrapper.sh
+ADD update_job_states.sh /jobengine/update_job_states.sh
+ADD common /common
+
 RUN chmod +x /start.sh
+RUN chmod +x /jobengine/wrapper.sh
+RUN chmod +x /jobengine/update_job_states.sh
 
 EXPOSE 8010
 
