@@ -4,6 +4,8 @@ set -o pipefail
 
 source /common
 
+printenv > /etc/environment
+
 DBDIR=/jobengine/db
 DBFILE=${DBDIR}/jobengine.sqlite3
 
