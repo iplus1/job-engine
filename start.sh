@@ -34,7 +34,7 @@ venv/bin/python manage.py collectstatic --no-input
 info "Starting Cron"
 service cron restart
 
-info "Restarting jobs from database."
+info "Looking for jobs to restart..."
 venv/bin/python manage.py reactivate_jobs
 
 info "Starting the update process..."
