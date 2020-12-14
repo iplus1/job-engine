@@ -7,7 +7,7 @@ CMD=$2
 PNAME=$1
 ALLELSE=$@
 
-number_occur=$(ps auxww | grep -v "grep" | grep -o "/jobengine/wrapper.sh '${PNAME}' " | wc -l)
+number_occur=$(ps auxww | grep -v "grep" | grep -o "/jobengine/wrapper.sh \"${PNAME}\" " | wc -l)
 
 if [ ${number_occur} -ge 2 ]; then
     error "Skipping execution. Already running (found '${number_occur}' for '${PNAME}') ..." >> /jobengine/out
