@@ -31,7 +31,6 @@ class Command(BaseCommand):
             if options['job_state'] == 'start':
                 open(f'{BASE_DIR}/jobs/{options["job_name"]}/last_output', 'w').close()
             DBHelper.update_state_name(options['job_name'], options['return_code'], options['job_state'])
-            return f'Job with Name: {options["job_name"]} should be updated with Status Code {options["return_code"]}'
         except Exception as e:
             print(f'[{timezone.now()}] Server Error: {e}')
             return f'An Error occurred while making the database entry for job: {options["job_name"]}'
