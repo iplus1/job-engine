@@ -52,7 +52,7 @@ function fill_help_modal(title, body) {
  */
 function status_button(status) {
     if (status === null) {
-        return `<input type="button" class="btn btn-warning btn-circle btn-sm"/>`;
+        return `<input type="button" class="btn btn btn-circle btn-sm" style="background-color: grey"/>`;
     } else if (status > 0) {
         return `<input type="button" class="btn btn-danger btn-circle btn-sm"/>`;
     } else {
@@ -87,7 +87,7 @@ function generate_control(data) {
     let logs = ``;
     let start_stop_btn = ``;
 
-    if (data['mode'].includes('cmd') || (data['mode'].includes('cron') && data['running'] === true)) {
+    if (data['mode'] === 'cmd' || data['mode'] === 'ipynb' || (data['mode'].includes('cron') && data['running'] === true)) {
         start_stop_btn = `<input type="button"  class="btn ${control_action_color} btn-xs" value="${control_action}" onclick="trigger_action('${control_action.toLowerCase()}','${data['id']}', '${data['name']}')"/>`;
     }
 

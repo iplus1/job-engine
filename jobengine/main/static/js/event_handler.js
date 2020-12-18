@@ -79,7 +79,7 @@ ready(function () {
         const cron_string = document.querySelector('#cronstring');
         const ipynb_files = document.querySelector('#ipynbfiles');
         const command = document.querySelector('#command_div');
-        if (this.value.includes('cmd')) {
+        if (this.value === 'cmd' || this.value === 'ipynb') {
             hide_element(cron_string);
         } else {
             show_element(cron_string);

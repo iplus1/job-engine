@@ -25,7 +25,7 @@ class Command(BaseCommand):
             for job_entry in all_crons:
                 try:
                     job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                              command=job_entry['command'], ipynb_file=job_entry['ipynb_file'])
+                              command_ipynb=job_entry['command_ipynb'])
                     if 'ipynb' in job.mode:
                         print(f'[{timezone.now()}]{job.create_ipynb_cron()}')
                     else:

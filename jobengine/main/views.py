@@ -116,7 +116,7 @@ def get_log(request):
         log_file = request.GET["log_file"]
         job_entry = DBHelper.get_job_by_id(job_id)
         job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
-                  command=job_entry.command, ipynb_file=job_entry.ipynb_file)
+                  command_ipynb=job_entry.command_ipynb)
         return HttpResponse(job.get_log(log_file))
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
@@ -149,7 +149,11 @@ def create_job(request):
         cron_string = json_data['cron_string']
         command = json_data['command']
         ipynb_file = json_data['ipynb_file']
-        job = Job(name=job_name, mode=mode, cron_string=cron_string, command=command, ipynb_file=ipynb_file)
+        if 'ipynb' in mode:
+            command_ipynb = ipynb_file
+        else:
+            command_ipynb = command
+        job = Job(name=job_name, mode=mode, cron_string=cron_string, command_ipynb=command_ipynb)
         return HttpResponse(ControlHelper(job, 'create').perform_action())
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
@@ -190,7 +194,7 @@ def control_job(request):
         json_data = json.loads(raw_data)
         job_entry = DBHelper.get_job_by_id(json_data['id'])
         job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
-                  command=job_entry.command, ipynb_file=job_entry.ipynb_file)
+                  command_ipynb=job_entry.command_ipynb)
         if json_data['action'] != 'logs':
             return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id).perform_action())
         else:

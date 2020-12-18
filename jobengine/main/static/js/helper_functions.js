@@ -101,7 +101,7 @@ async function trigger_create(e) {
         case 'cron ipynb':
             body = `${body} <br> <b>Cron:</b> ${data.cron_string} <br> <b>Notebook:</b> ${data.ipynb_file}`;
             break;
-        case 'cmd ipynb':
+        case 'ipynb':
             body = `${body} <br> <b>Notebook:</b> ${data.ipynb_file}`;
             break;
     }

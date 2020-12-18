@@ -24,7 +24,7 @@ class Command(BaseCommand):
         for job_entry in all_entries:
             try:
                 job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                          command=job_entry['command'], ipynb_file=job_entry['ipynb_file'])
+                          command_ipynb=job_entry['command_ipynb'])
                 output = ''
                 if os.path.isfile(f'{job.job_dir}/last_output'):
                     with open(f'{job.job_dir}/last_output', 'r') as file:

@@ -67,7 +67,7 @@ class ControlHelper:
             return self.job.create_ipynb_cron()
         elif self.job.mode == 'cmd':
             return self.job.create_cmd()
-        elif self.job.mode == 'cmd ipynb':
+        elif self.job.mode == 'ipynb':
             return self.job.create_ipynb_cmd()
 
     def delete(self):

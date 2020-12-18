@@ -110,7 +110,7 @@ class DBHelper:
         for job_entry in all_job_entries:
             try:
                 job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                          command=job_entry['command'], ipynb_file=job_entry['ipynb_file'])
+                          command_ipynb=job_entry['command_ipynb'])
                 if os.path.isfile(f'{job.job_dir}/last_output'):
                     with open(f'{job.job_dir}/last_output', 'r') as file:
                         output = file.read()
@@ -125,6 +125,6 @@ class DBHelper:
         """Create an entry in the job database depending on the."""
 
         job_entry = JobEntry.objects.create(name=job.name, mode=job.mode, cron_string=job.cron_string,
-                                            command=job.command, ipynb_file=job.ipynb_file)
+                                            command_ipynb=job.command_ipynb)
         return job_entry
 

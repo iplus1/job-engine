@@ -14,7 +14,7 @@ BASE_DIR = '/jobengine'
 
 class Job:
 
-    def __init__(self, name, mode, cron_string, command, ipynb_file=''):
+    def __init__(self, name, mode, cron_string, command_ipynb):
         """The Job class is responsible for all operations necessary to create, delete, start and stop a Job.
 
         Create the necessary Job directory if it doesnt exist.
@@ -33,16 +33,14 @@ class Job:
         :param name: string: name of the Job.
         :param mode: string: specifies the mode of the Job (Expected: 'cmd', 'cron', 'cmd ipynb', 'cron ipynb')
         :param cron_string: string: specifies the interval for the Crontab. (Only relevant if 'mode' includes 'cron')
-        :param command: string: command that the job should execute. (Only relevant if the 'mode' includes 'cmd')
-        :param ipynb_file: string: ipynb file path. (optional)
+        :param command_ipynb: string: command or path that the job uses depending on the mode.
         """
-
+        self.command_ipynb = command_ipynb
         self.name = name
         self.mode = mode
-        self.command = command
         self.job_dir = f'{BASE_DIR}/jobs/{self.name}'
         self.pid = self.get_pid_name()
-        self.ipynb_file = ipynb_file
+
         if not os.path.exists(self.job_dir):
             os.makedirs(self.job_dir)
 
@@ -51,11 +49,9 @@ class Job:
             self.cron = CronTab(user='root')
         else:
             self.cron_string = None
+
         if 'ipynb' in mode:
-            self.job_file = ntpath.basename(self.ipynb_file)
-            self.command = None
-        else:
-            self.ipynb_file = None
+            self.job_file = ntpath.basename(self.command_ipynb)
 
     def copy_ipynb_file(self):
         """Copy the source ipynb into the Job directory.
@@ -67,8 +63,8 @@ class Job:
         :exception FileNotFoundError if source file doesnt exist.:
         """
 
-        if os.path.isfile(self.ipynb_file):
-            shutil.copy2(self.ipynb_file, f'{self.job_dir}/')
+        if os.path.isfile(self.command_ipynb):
+            shutil.copy2(self.command_ipynb, f'{self.job_dir}/')
             return f'<b>{self.name}:</b> Job File is now in place.'
         else:
             raise FileNotFoundError(f'<b>{self.name}:</b> File was not found.')
@@ -297,20 +293,21 @@ class Job:
         """
 
         status_code = fr'code=\$?'
-        update_status = fr'/var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status \"{self.name}\" \$code \"end\"'
+        update_status = fr'cd /var/www/jobengine && /var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status \"{self.name}\" \$code \"end\"'
+        escaped_job_dir = self.job_dir.replace(' ', '\\ ')
         if 'ipynb' in self.mode:
-            if 'cmd' in self.mode:
-                log_creation = f'cp {self.job_dir}/{self.job_file}.html {self.job_dir}/{self.job_file}.$(date +\%Y-\%m-\%d-\%H\%M\%S).html'
+            if 'cron' in self.mode:
+                log_creation = f'cp {escaped_job_dir}/{self.job_file}.html {escaped_job_dir}/{self.job_file}.$(date +\\\%Y-\\\%m-\\\%d-\\\%H\\\%M\\\%S).html'
             else:
-                log_creation = f'cp {self.job_dir}/{self.job_file}.html {self.job_dir}/{self.job_file}.$(date +\\\%Y-\\\%m-\\\%d-\\\%H\\\%M\\\%S).html'
-            nb_convert = f'/opt/conda/bin/jupyter nbconvert --ExecutePreprocessor.timeout=None --to html --output {self.job_dir}/{self.job_file}.html --execute {self.job_dir}/{self.job_file}'
+                log_creation = f'cp {escaped_job_dir}/{self.job_file}.html {escaped_job_dir}/{self.job_file}.$(date +\%Y-\%m-\%d-\%H\%M\%S).html'
+            nb_convert = f'/opt/conda/bin/jupyter nbconvert --ExecutePreprocessor.timeout=None --to html --output {escaped_job_dir}/{self.job_file}.html --execute {escaped_job_dir}/{self.job_file}'
             base_command = f'{nb_convert} && {log_creation}'
-            garbage_collector = f'find {self.job_dir}/{self.job_file}.*.html -mmin +30 -exec rm {{}} \\;'
+            garbage_collector = f'find {escaped_job_dir}/{self.job_file}.*.html -mmin +30 -exec rm {{}} \\;'
             ipynb_command = f'{base_command} && {garbage_collector}'
             full_command = f'/jobengine/wrapper.sh "{self.name}" "{ipynb_command} ; {status_code} ; {update_status}"'
             return full_command
         else:
-            escaped_command = self.command.replace('"', r'\"').replace('$', r'\$')
+            escaped_command = self.command_ipynb.replace('"', r'\"').replace('$', r'\$')
             full_command = f'/jobengine/wrapper.sh "{self.name}" "{escaped_command} ; {status_code} ; {update_status}"'
             return full_command
 

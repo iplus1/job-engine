@@ -53,7 +53,7 @@ function job_table() {
             {
                 title: 'Name',
                 field: 'name',
-                width: 110,
+                width: 120,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
@@ -69,15 +69,9 @@ function job_table() {
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
-                title: 'Command',
-                field: 'command',
-                width: 280,
-                cellClick: (e, cell) => on_cell_click(cell)
-            },
-            {
-                title: 'Ipynb Path',
-                field: 'ipynb_file',
-                width: 140,
+                title: 'Command / Ipynb',
+                field: 'command_ipynb',
+                width: 400,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
@@ -94,33 +88,10 @@ function job_table() {
                 }
             },
             {
-                title: 'L. Status',
-                field: 'last_status',
-                hozAlign: "center",
-                width: 115,
-                cellClick: (e, cell) => on_cell_click(cell),
-                titleFormatter: (element) => {
-                    return `${element.getValue()}  <a href="#" onclick="get_help('status_help_holder')">
-                            <span class="glyphicon glyphicon-question-sign"></span></a></label>`;
-                },
-                formatter: (cell) => {
-                    return status_button(cell.getValue());
-                },
-                tooltip: function (cell) {
-                    if (cell.getValue() === null) {
-                        return 'Waiting on Execution...';
-                    } else if (cell.getValue() === 137) {
-                        return 'Return Code: 137 Process has been stopped.';
-                    } else {
-                        return `Return Code: ${cell.getValue()}`;
-                    }
-                }
-            },
-            {
-                title: 'C. Status',
+                title: 'Status',
                 field: 'current_status',
                 hozAlign: "center",
-                width: 115,
+                width: 105,
                 cellClick: (e, cell) => on_cell_click(cell),
                 titleFormatter: (element) => {
                     return `${element.getValue()}  <a href="#" onclick="get_help('status_help_holder')">
@@ -142,19 +113,19 @@ function job_table() {
             {
                 title: 'Output',
                 field: 'output',
-                width: 90,
+                width: 200,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
                 title: 'Start Date',
                 field: 'start_date',
-                width: 140,
+                width: 160,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
                 title: 'End Date',
                 field: 'end_date',
-                width: 140,
+                width: 160,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
