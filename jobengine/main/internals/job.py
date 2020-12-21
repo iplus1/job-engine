@@ -293,7 +293,8 @@ class Job:
         """
 
         status_code = fr'code=\$?'
-        update_status = fr'cd /var/www/jobengine && /var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status \"{self.name}\" \$code \"end\"'
+        escaped_name = self.name.replace(' ', '\\ ')
+        update_status = fr'cd /var/www/jobengine && /var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status {escaped_name} \$code \"end\"'
         escaped_job_dir = self.job_dir.replace(' ', '\\ ')
         if 'ipynb' in self.mode:
             if 'cron' in self.mode:

@@ -144,11 +144,13 @@ def create_job(request):
     try:
         raw_data = request.read()
         json_data = json.loads(raw_data)
-        job_name = json_data['job_name']
+        job_name = json_data['job_name'].rstrip()
         mode = json_data['mode']
         cron_string = json_data['cron_string']
         command = json_data['command']
         ipynb_file = json_data['ipynb_file']
+        if ControlHelper.check_special_characters(job_name):
+            raise Exception('Forbidden character found in job_name')
         if 'ipynb' in mode:
             command_ipynb = ipynb_file
         else:

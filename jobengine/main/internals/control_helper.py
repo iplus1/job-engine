@@ -145,3 +145,12 @@ class ControlHelper:
 
         return self.job.get_logs()
 
+    @staticmethod
+    def check_special_characters(string):
+        """Check a string for forbidden characters.
+
+        :param string: Expects a valid string.
+        :return: boolean
+        """
+        search = re.compile(r'[^a-zA-Z0-9_\-\s+]').search
+        return bool(search(string))
