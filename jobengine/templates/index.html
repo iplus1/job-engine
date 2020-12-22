@@ -149,18 +149,19 @@
     <!-- Help Content Cron -->
     <div id="cron_help_holder" style="display:none;">
         There are two options for running a jupyter notebook:
-        <b>command</b>
+        <b>ipynb</b>
         and
-        <b>cron job</b>
+        <b>ipynb cron</b>
         .
-        <b>command</b>
+        <b>ipynb</b>
         means that the selected notebook is started only once, which makes sense, e.g., for streaming jobs that run
         continuously. The developer/notebook has to make sure that the command prints status information etc. to STDOUT
-        or an external data source where it can be captured. STDOUT is accessible via the output buttons. Please note
-        that it is not possible to use inline tags in the notebook cells, because the .ipynb is exported to a .py.<br>
-        <b>cron job</b>
+        or STDERR. STDOUT/ERR are accessible in the output column. Please note
+        that it is not possible to use inline tags in the notebook cells, because the .ipynb is exported to a .py.
+        The output is also viewable as an html file that gets created while converting the notebook.<br>
+        <b>ipynb cron</b>
         executes the notebook regularly. This is similar to starting the whole notebook in the Jupyter IDE. The output
-        is written to an html that can be accessed via the output buttons. Create a cron string as follows:
+        is written to an html that can be accessed via the log button or into the output column. Create a cron string as follows:
         <pre>
      ┌───────────── minute (0 - 59)
      │ ┌───────────── hour (0 - 23)
@@ -177,13 +178,11 @@
 
     <!-- Help Content Status -->
     <div id="status_help_holder" style="display: none;">
-        <p>The Status columns reflect the status of the job by displaying the Return Code of the job <br>
+        <p>The Status column reflects the status of the job by displaying the Return Code of the job <br>
             or that the job is currently waiting to be completed.</p>
-        <p>The first status column stores the status of the last execution of the job. (L. = Last)<br>
-            While the second status column stores the status of the current execution. (C. = Current)
         </p>
         <p>To easily distinguish the three cases the Return Code gets displayed by either a green, <br>
-            yellow or red circle. To see the Return Code hover or click the status cell of the job. <br>
+            red or grey circle. To see the Return Code hover or click the status cell of the job. <br>
             <br>
             <b>Status Description:</b>
         </p>
@@ -191,7 +190,7 @@
         <pre>
  <input type="button" class="btn btn-success btn-circle btn-sm"/> : Job execution successful - Return code 0.
 
- <input type="button" class="btn btn-warning btn-circle btn-sm"/> : Job is waiting to complete its execution.
+ <input type="button" class="btn btn btn-circle btn-sm" style="background-color: grey"/> : Job is waiting to complete its execution.
 
  <input type="button" class="btn btn-danger btn-circle btn-sm"/> : Job execution failed - Return Code greater then 0.
         </pre>
@@ -241,7 +240,7 @@
 
  <b>cron ipynb:</b> The specified <b>ipynb</b> will be executed as a Cron-Job in a set interval defined by the <b>Cron String</b>.
 
- <b>cmd ipynb:</b> The specified <b>ipynb</b> will be executed once.
+ <b>ipynb:</b> The specified <b>ipynb</b> will be executed once.
         </pre>
     </div>
 
