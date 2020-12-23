@@ -1,3 +1,5 @@
+import re
+
 from django.utils import timezone
 
 from main.internals.db_helper import DBHelper
