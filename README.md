@@ -1,37 +1,42 @@
-#### Description
+## Description
 
-Jobengine is a container application that helps the user to create and manage jobs that can perform tasks on the container or a cluster.
+Jobengine is an open-source docker container that helps you to easily create, manage and schedule jobs.
 
-The container uses Django as a web-framework to present the user a simplistic and easy to use frontend that displays all relevant information for the jobs in a table. 
+#### Features:
+- Provides a web-based User-Interface.
+- Can execute shell-commands and custom scripts.
+- Uses Cron to schedule jobs on the container. 
+- Displays the status, output and logs of a job.
+- Contains all necessary libs and packages to convert and run ipynbs.
 
-The user is able to create jobs through a form in the frontend that includes various options for different modes the jobs can run in.
-
-To give the user the ability to execute tasks for the container on startup, the jobengine checks if a script named ``pre_conditions.sh`` exists and executes it.
-This script is optional and will only run once when the container is started.
-
-#### Modes
-
-The Jobengine can execute commands or ipynbs like you would do it in Shell or in an interval through Crontab. We therefore differentiate between four modes: 
-
-    cmd        : Run a command once like a normal shell command.
-    cron       : Run a command in a defined interval through Cron.
-    ipynb      : Run a converted ipynb once through the shell.
-    cron ipynb : Run a converted ipynb in a defined interval through Cron.
-
-#### Install
-
-1. Mounting volumes to persist data:
-    1. Database for the jobs:     ``/your/db/directory:/jobengine/db``
-    2. Source ipynbs: ``/your/jupyter/directory:/jobengine/ipynbs``
-    3. Job ipynbs:    ``/your/job/directory:/jobengine/jobs``
-    
-3. **(Optional)** Pre conditions script:
-    1. Add a script named ``pre_conditions.sh`` in the ``/`` of the container.
-
-#### Example Dockerfile
+## Quickstart
 
 ````shell script
-$ docker run --name some-jobengine -v /your/db/directory:/jobengine/db -v /your/jupyter/directory:/jobengine/ipynbs -v /your/job/directory:/jobengine/jobs iplus1/job-engine:0.0.1
+$ docker run --name=my-jobengine -p 8010:8010 iplus1/job-engine:0.0.3
 ````
 
+Additional arguments:
 
+  |Argument|Desciption|
+  |---|---|
+  |``-v /your/db/directory:/jobengine/db`` | Mount a database volume to persist the database containing the jobs. <br/> Helps to preserve saved jobs.|
+  |``-v /your/jupyter/directory:/jobengine/ipynbs``| Mount a volume that includes ipynbs that can be used to create jobs. <br/> The jobengine will use this directory to look for suitable ipynbs to execute.|
+  |``-v /your/job/directory:/jobengine/jobs``| The Jobengine makes a job directory for every job created through the engine. <br/> Log files, the last output and the possible executed ipynb that are stored in it <br/> can be persisted by mounting a volume.|
+  |``-v /path/to/pre_conditions.sh:/pre_conditions.sh``| On startup the Jobengine container checks if the pre_conditions.sh script exists <br/> and if so executes it. This gives the user the ability to perform certain tasks <br/> that have to run before the jobengine is finished starting. |
+  |``-v /path/to/custom/script.sh:/usr/local/bin/script.sh``| It is also possible to mount your own scripts into the PATH of the Jobengine <br/> container, which allows for an ease of use by just calling it as a command. |
+
+After successfully starting the container you can access the user-interface by opening it in your browser. http://localhost:8010/ 
+
+## UI
+
+#### Job table:
+
+![example job table](png/example_filled_table.png)
+
+#### Create-job menu:
+
+![example job creation](png/example_job_creat.png)
+
+#### Example job output:
+
+![example job output](png/example_output.png)
