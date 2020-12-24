@@ -51,4 +51,4 @@ venv/bin/uwsgi --chdir=/var/www/jobengine/ \
     --max-requests=32768 \
     --home=/var/www/jobengine/venv \
     --buffer-size=65535 \
-    --static-map /static=/var/www/jobengine/static \
+    --static-map /jobengine/static=/var/www/jobengine/static \
