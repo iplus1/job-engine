@@ -31,6 +31,41 @@ async function display_after_logs(text, id) {
 }
 
 /**
+ * Display a selection of available log-files for the job.
+ *
+ * @param text: Expects the selection of available logs as a string.
+ * @param id: Expects an integer with the id of the job.
+ * @returns {Promise<void>}
+ */
+async function display_edit(id, job_name, job_mode, job_cron, job_command) {
+    const notification_modal = document.querySelector("#notification_modal");
+    let body = `<br>Editing a running job will cause it to be <b>stopped</b> and the output will be <b>discarded</b>.<br> Do you want to continue?`;
+    fill_notification_modal('Edit Notification', body);
+    show_element(notification_modal);
+    if (await confirm_notification(notification_modal)) {
+        const edit_modal = document.querySelector('#edit_modal');
+        fill_edit_modal(id, job_name, job_mode, job_cron, job_command);
+        show_element(edit_modal);
+        const edit_mode = document.querySelector('#edit_mode');
+        const edit_cron_string = document.querySelector('#edit_cronstring');
+        const edit_ipynb_files = document.querySelector('#edit_ipynbfiles');
+        const edit_command = document.querySelector('#edit_command_div');
+        if (edit_mode.value === 'cmd' || edit_mode.value === 'ipynb') {
+            hide_element(edit_cron_string);
+        } else {
+            show_element(edit_cron_string);
+        }
+        if (!edit_mode.value.includes('ipynb')) {
+            hide_element(edit_ipynb_files);
+            show_element(edit_command);
+        } else {
+            show_element(edit_ipynb_files);
+            hide_element(edit_command);
+        }
+    }
+}
+
+/**
  * Display the error that occurred while making the request.
  *
  * @param error: Expects the error that occurred as a string.
@@ -77,19 +112,12 @@ async function trigger_action(action, id, job_name) {
 }
 
 /**
- * Trigger the create job function.
+ * Prepare the data of a job to be displayed in a notification modal.
  *
- * Ask the user to confirm his input for the creation of the job.
- * Display only the necessary information for the specified 'mode' of the job.
- *
- * @param e: Expects the initial submit event.
- * @returns {Promise<void>}
+ * @param title: Expects a string containing the title of the modal.
+ * @param data: Expects an object containing the data of the specified job.
  */
-async function trigger_create(e) {
-    const notification_modal = document.querySelector("#notification_modal");
-    e.preventDefault();
-    const url = e.currentTarget.action;
-    const data = Object.fromEntries(new FormData(e.target));
+function prepare_data_for_notification(title, data) {
     let body = `<br> <b>Job:</b> ${data.job_name} <br> <b>Mode:</b> ${data.mode}`;
     switch (data.mode) {
         case 'cron':
@@ -105,7 +133,25 @@ async function trigger_create(e) {
             body = `${body} <br> <b>Notebook:</b> ${data.ipynb_file}`;
             break;
     }
-    fill_notification_modal('Confirm Create', body);
+    fill_notification_modal(title, body);
+}
+
+
+/**
+ * Trigger the create job function.
+ *
+ * Ask the user to confirm his input for the creation of the job.
+ * Display only the necessary information for the specified 'mode' of the job.
+ *
+ * @param e: Expects the initial submit event.
+ * @returns {Promise<void>}
+ */
+async function trigger_create(e) {
+    const notification_modal = document.querySelector("#notification_modal");
+    e.preventDefault();
+    const url = e.currentTarget.action;
+    const data = Object.fromEntries(new FormData(e.target));
+    prepare_data_for_notification('Confirm Create', data);
     show_element(notification_modal);
     if (await confirm_notification(notification_modal)) {
         hide_element(document.querySelector('#create_modal'));
@@ -114,11 +160,34 @@ async function trigger_create(e) {
 }
 
 /**
+ * Trigger the edit job function.
+ *
+ * Ask the user to confirm his input for the edit of the job.
+ * Display only the necessary information for the specified 'mode' of the job.
+ *
+ * @param e: Expects the initial submit event.
+ * @returns {Promise<void>}
+ */
+async function trigger_edit(e) {
+    const notification_modal = document.querySelector("#notification_modal");
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    prepare_data_for_notification('Confirm Changes', data);
+    show_element(notification_modal);
+    if (await confirm_notification(notification_modal)) {
+        hide_element(document.querySelector('#edit_modal'));
+        edit_job(data);
+    }
+}
+
+
+/**
  * Simulate the sleep behavior and returning a Promise.
  *
  * @param milliseconds: Expects an integer with the milliseconds to wait.
  * @returns {Promise<unknown>}
  */
 function Sleep(milliseconds) {
- return new Promise(resolve => setTimeout(resolve, milliseconds));
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
+

@@ -71,7 +71,7 @@ function job_table() {
             {
                 title: 'Command / Ipynb',
                 field: 'command_ipynb',
-                width: 400,
+                width: 300,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {

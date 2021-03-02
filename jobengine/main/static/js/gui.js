@@ -43,6 +43,27 @@ function fill_help_modal(title, body) {
 }
 
 /**
+ * Fill the edit modal with the correct content for the specific job.
+ *
+ * @param id: Expects an integer as the ID for the job.
+ * @param name: Expects a string to insert as the name of the job.
+ * @param mode: Expects a string to insert as the mode of the job.
+ * @param cron: Expects a string to insert as the cron string of the job.
+ * @param command_ipynb: Expects a string to insert as the command or ipynb of the job.
+ */
+function fill_edit_modal(id, name, mode, cron, command_ipynb) {
+    document.querySelector('#edit_job_id').value = id;
+    document.querySelector('#edit_job_name').value = name;
+    document.querySelector('#edit_mode').value = mode;
+    document.querySelector('#edit_cron_string').value = cron;
+    if (mode.includes('ipynb')) {
+        document.querySelector('#edit_ipynb_file').value = command_ipynb;
+    } else {
+        document.querySelector('#edit_command').value = command_ipynb;
+    }
+}
+
+/**
  * Create an input field with the 'btn-circle'-class assigned to make it round.
  *
  * For better and direct visibility of the current status of the job.
@@ -97,6 +118,8 @@ function generate_control(data) {
         logs = `<input type="button" class="btn btn-info btn-xs" value="Logs" onclick="trigger_action('logs','${data['id']}', '${data['name']}')"/>`;
     }
     const delete_btn = `<input type="button" class="btn btn-danger btn-xs" value="Delete" onclick="trigger_action('delete','${data['id']}', '${data['name']}')"/>`;
-    return `<span>${start_stop_btn} ${cleanup_btn} ${update_btn} ${logs} ${delete_btn}</span>`;
+    const edit_btn = `<input type="button" class="btn btn-info btn-xs" value="Edit" onclick="display_edit('${data['id']}', '${data['name']}', '${data['mode']}', '${data['cron_string']}', '${data['command_ipynb']}')"/>`;
+    return `<span>${edit_btn} ${delete_btn} ${start_stop_btn} ${cleanup_btn} ${update_btn} ${logs}</span>`;
 }
+
 

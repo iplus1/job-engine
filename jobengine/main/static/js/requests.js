@@ -82,6 +82,33 @@ function control_job(action, id) {
 }
 
 /**
+ * Make a request to perform an edit action for a specified job.
+ *
+ * @param data: Expects an object containing the data for the job that needs to be edited.
+ */
+function edit_job(data) {
+    const csrftoken = getCookie('csrftoken');
+    data.action = 'edit'
+    fetch('control_job/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify(data)
+    })
+        .then(error_handling)
+        .then(response => response.text())
+        .then(async function (response) {
+            display_after_control(response);
+        })
+        .catch(function (error) {
+            display_after_error(error);
+        });
+}
+
+/**
  * Update the table-data in a set interval via the Sleep function.
  *
  */

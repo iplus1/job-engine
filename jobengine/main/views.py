@@ -187,6 +187,10 @@ def control_job(request):
     :param request: Expected JSON-attributes:
         'id': int;
         'action': string;
+        **optional**
+        'name': string;
+        'cron' string;
+        'command-ipynb' string;
     :return: Either the status of the perform_action() function or the logs_selection.html
     :exception Exception if try fails. Printed to the terminal and returned as HttpResponse.:
     """
@@ -197,13 +201,27 @@ def control_job(request):
         job_entry = DBHelper.get_job_by_id(json_data['id'])
         job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
                   command_ipynb=job_entry.command_ipynb)
-        if json_data['action'] != 'logs':
-            return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id).perform_action())
-        else:
+
+        if json_data['action'] == 'logs':
             context = ControlHelper(job, json_data['action'], job_entry.id).perform_action()
             return TemplateResponse(request, 'logs_selection.html', context)
+
+        elif json_data['action'] == 'edit':
+            if ControlHelper.check_special_characters(json_data['job_name'].rstrip()):
+                raise Exception('Forbidden character found in job_name')
+            if 'ipynb' in job_entry.mode:
+                command_ipynb = json_data['ipynb_file']
+            else:
+                command_ipynb = json_data['command']
+            job_new_data = {
+                'name': json_data['job_name'],
+                'cron_string': json_data['cron_string'],
+                'command_ipynb': command_ipynb
+            }
+            return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id, job_new_data).perform_action())
+        else:
+            return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id).perform_action())
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
         return HttpResponse(f'[{timezone.now()}] Server Error: {e}')
-
 

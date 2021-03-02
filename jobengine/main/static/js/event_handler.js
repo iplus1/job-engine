@@ -66,10 +66,15 @@ function confirm_notification(modal) {
 ready(function () {
     const help_modal = document.querySelector('#help_modal');
     const create_modal = document.querySelector('#create_modal');
+    const edit_modal = document.querySelector('#edit_modal');
     const container = help_modal.querySelector('.container');
     const add_btn = document.querySelector('#add_job-btn');
     document.querySelector("#job_form").addEventListener('submit', (e) => {
         trigger_create(e);
+    });
+
+    document.querySelector("#edit_job_form").addEventListener('submit', (e) => {
+        trigger_edit(e);
     });
 
     /**
@@ -118,6 +123,16 @@ ready(function () {
             case document.querySelector('#create_modal-close'):
                 hide_element(create_modal);
                 break;
+            case  edit_modal:
+                if (event.target !== edit_modal && event.target !== container) return;
+                hide_element(edit_modal);
+                break;
+            case document.querySelector('#edit_modal-tic'):
+                hide_element(edit_modal);
+                break;
+            case document.querySelector('#edit_modal-close'):
+                hide_element(edit_modal);
+                break;
             case add_btn:
                 show_element(create_modal);
         }
@@ -125,4 +140,5 @@ ready(function () {
     job_table();
     update_table();
 });
+
 

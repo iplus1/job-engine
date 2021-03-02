@@ -121,6 +121,18 @@ class DBHelper:
         return f'All STDs updated.'
 
     @staticmethod
+    def edit_job(job_id, job_name, job_cron, job_command):
+        """Edit the Name, Crontab and Command of a job.
+
+        Sets the current_status, start_date and end_date to its default state.
+        """
+
+        JobEntry.objects.filter(id=job_id).update(name=job_name, cron_string=job_cron, command_ipynb=job_command,
+                                                  current_status=0, start_date=None,
+                                                  end_date=None)
+        return f'Job info updated.'
+
+    @staticmethod
     def create_entry(job):
         """Create an entry in the job database depending on the."""
 

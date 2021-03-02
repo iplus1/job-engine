@@ -3,11 +3,12 @@ import re
 from django.utils import timezone
 
 from main.internals.db_helper import DBHelper
+from main.internals.job import Job
 
 
 class ControlHelper:
 
-    def __init__(self, job, action, job_id=None):
+    def __init__(self, job, action, job_id=None, job_new_data=None):
         """Constructor for the ControlHelper.
 
         :param job: Job-Object: main.internals.job.
@@ -18,6 +19,7 @@ class ControlHelper:
         self.job = job
         self.job_id = job_id
         self.action = action
+        self.job_new_data = job_new_data
 
     def perform_action(self):
         """Execute a specific function depending on the 'action' parameter.
@@ -52,6 +54,10 @@ class ControlHelper:
 
             elif self.action == 'logs':
                 return self.logs()
+
+            elif self.action == 'edit':
+                return self.edit()
+
         except Exception as e:
             print(f'[{timezone.now()}] Server Error: {e}')
             return f'[{timezone.now()}] Server Error: {e} with {self.job.name}'
@@ -147,6 +153,33 @@ class ControlHelper:
 
         return self.job.get_logs()
 
+    def edit(self):
+        """Edit the job with new parameters.
+
+        :return: Status of the edit() function
+        :rtype: str
+        """
+        self.stop()
+        self.job.delete_job_dir()
+        if 'cron' in self.job.mode:
+            self.job.delete_cron()
+        else:
+            self.job_new_data['cron_string'] = ''
+
+        DBHelper.edit_job(self.job_id, self.job_new_data['name'], self.job_new_data['cron_string'],
+                          self.job_new_data['command_ipynb'])
+
+        self.job = Job(name=self.job_new_data['name'], mode=self.job.mode, cron_string=self.job_new_data['cron_string'],
+                       command_ipynb=self.job_new_data['command_ipynb'])
+
+        if 'cron' in self.job.mode:
+            self.job.create_cron()
+
+        if 'ipynb' in self.job.mode:
+            self.job.copy_ipynb_file()
+
+        return f'<b>{self.job.name}:</b> The job info has been modified.'
+
     @staticmethod
     def check_special_characters(string):
         """Check a string for forbidden characters.
@@ -156,3 +189,4 @@ class ControlHelper:
         """
         search = re.compile(r'[^a-zA-Z0-9_\-\s+]').search
         return bool(search(string))
+
