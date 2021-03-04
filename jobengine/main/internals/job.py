@@ -14,7 +14,7 @@ BASE_DIR = '/jobengine'
 
 class Job:
 
-    def __init__(self, name, mode, cron_string, command_ipynb):
+    def __init__(self, name, mode, cron_string, command_ipynb, job_id):
         """The Job class is responsible for all operations necessary to create, delete, start and stop a Job.
 
         Create the necessary Job directory if it doesnt exist.
@@ -35,10 +35,12 @@ class Job:
         :param cron_string: string: specifies the interval for the Crontab. (Only relevant if 'mode' includes 'cron')
         :param command_ipynb: string: command or path that the job uses depending on the mode.
         """
+
+        self.id = job_id
         self.command_ipynb = command_ipynb
         self.name = name
         self.mode = mode
-        self.job_dir = f'{BASE_DIR}/jobs/{self.name}'
+        self.job_dir = f'{BASE_DIR}/jobs/{self.id}'
         self.pid = self.get_pid_name()
 
         if not os.path.exists(self.job_dir):
@@ -78,7 +80,7 @@ class Job:
         :return: Status of the started Cron-Job.
         """
 
-        job = self.cron.new(command=self.build_command(), comment=f'Identifier: {self.name}')
+        job = self.cron.new(command=self.build_command(), comment=f'Identifier: {self.id}')
         job.setall(self.cron_string)
         self.cron.write()
         return f'<b>{self.name}</b> has been started as a {self.mode}-job.'
@@ -94,8 +96,7 @@ class Job:
         """
 
         self.copy_ipynb_file()
-        job = self.cron.new(command=self.build_command(),
-                            comment=f'Identifier: {self.name}')
+        job = self.cron.new(command=self.build_command(), comment=f'Identifier: {self.id}')
         job.setall(self.cron_string)
         self.cron.write()
         return f'<b>{self.name}</b> has been started as a {self.mode}-job.'
@@ -136,7 +137,7 @@ class Job:
         :return: Stratus of the Crontab entry deletion.
         """
 
-        job = self.cron.find_comment(f'Identifier: {self.name}')
+        job = self.cron.find_comment(f'Identifier: {self.id}')
         self.cron.remove(job)
         self.cron.write()
         return f'<b>{self.name}:</b> The cron entry has been deleted.'
@@ -232,7 +233,7 @@ class Job:
 
         for p in psutil.process_iter():
             joined = " ".join(p.cmdline())
-            if f'/jobengine/wrapper.sh "{self.name}"' in joined:
+            if f'/jobengine/wrapper.sh "{self.id}"' in joined:
                 return p.pid
         return None
 
@@ -293,8 +294,7 @@ class Job:
         """
 
         status_code = fr'code=\$?'
-        escaped_name = self.name.replace(' ', '\\ ')
-        update_status = fr'cd /var/www/jobengine && /var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status {escaped_name} \$code \"end\"'
+        update_status = fr'cd /var/www/jobengine && /var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status {self.id} \$code \"end\"'
         escaped_job_dir = self.job_dir.replace(' ', '\\ ')
         if 'ipynb' in self.mode:
             if 'cron' in self.mode:
@@ -305,10 +305,11 @@ class Job:
             base_command = f'{nb_convert} && {log_creation}'
             garbage_collector = f'find {escaped_job_dir}/{self.job_file}.*.html -mmin +30 -exec rm {{}} \\;'
             ipynb_command = f'{base_command} && {garbage_collector}'
-            full_command = f'/jobengine/wrapper.sh "{self.name}" "{ipynb_command} ; {status_code} ; {update_status}"'
+            full_command = f'/jobengine/wrapper.sh "{self.id}" "{ipynb_command} ; {status_code} ; {update_status}"'
             return full_command
         else:
             escaped_command = self.command_ipynb.replace('"', r'\"').replace('$', r'\$')
-            full_command = f'/jobengine/wrapper.sh "{self.name}" "{escaped_command} ; {status_code} ; {update_status}"'
+            full_command = f'/jobengine/wrapper.sh "{self.id}" "{escaped_command} ; {status_code} ; {update_status}"'
             return full_command
+
 

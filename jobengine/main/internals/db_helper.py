@@ -79,7 +79,7 @@ class DBHelper:
         return f'Job status updated.'
 
     @staticmethod
-    def update_state_name(job_name, job_status, state):
+    def update_state_id(job_id, job_status, state):
         """Update the overall state of the job.
 
         Depending on the state variable update multiple columns of the job.
@@ -87,19 +87,19 @@ class DBHelper:
         start: Make sure that status, output and end_date are cleared for a new execution of the job.
         end: Make sure that the status of the job and the end_date is set.
         """
-        job_entry = DBHelper.get_job_by_name(job_name)
+        job_entry = DBHelper.get_job_by_id(job_id)
         if state == 'start':
-            JobEntry.objects.filter(name=job_name).update(running=True, last_status=job_entry.current_status,
-                                                          current_status=None, output=None, start_date=timezone.now(),
-                                                          end_date=None)
+            JobEntry.objects.filter(id=job_id).update(running=True, last_status=job_entry.current_status,
+                                                      current_status=None, output=None, start_date=timezone.now(),
+                                                      end_date=None)
         elif state == 'end':
             if job_entry.last_status is not None:
-                JobEntry.objects.filter(name=job_name).update(running=False, current_status=job_status,
-                                                              end_date=timezone.now())
+                JobEntry.objects.filter(id=job_id).update(running=False, current_status=job_status,
+                                                          end_date=timezone.now())
             else:
-                JobEntry.objects.filter(name=job_name).update(running=False, last_status=job_status,
-                                                              current_status=job_status,
-                                                              end_date=timezone.now())
+                JobEntry.objects.filter(id=job_id).update(running=False, last_status=job_status,
+                                                          current_status=job_status,
+                                                          end_date=timezone.now())
         return f'Job status updated.'
 
     @staticmethod
@@ -110,15 +110,22 @@ class DBHelper:
         for job_entry in all_job_entries:
             try:
                 job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                          command_ipynb=job_entry['command_ipynb'])
+                          command_ipynb=job_entry['command_ipynb'], job_id=job_entry['id'])
                 if os.path.isfile(f'{job.job_dir}/last_output'):
                     with open(f'{job.job_dir}/last_output', 'r') as file:
                         output = file.read()
-                    JobEntry.objects.filter(name=job.name).update(output=output)
+                    JobEntry.objects.filter(id=job.id).update(output=output)
             except Exception as e:
                 print(f'[{timezone.now()}] Server Error: {e}')
                 return f'[{timezone.now()}] Server Error: {e}'
         return f'All STDs updated.'
+    
+    @staticmethod
+    def stop_process(job_id):
+        """Mirror the stop of a process by changing the status to 137 and the end date to current"""
+
+        JobEntry.objects.filter(id=job_id).update(current_status=137, end_date=timezone.now())
+        return
 
     @staticmethod
     def edit_job(job_id, job_name, job_cron, job_command):
@@ -127,16 +134,15 @@ class DBHelper:
         Sets the current_status, start_date and end_date to its default state.
         """
 
-        JobEntry.objects.filter(id=job_id).update(name=job_name, cron_string=job_cron, command_ipynb=job_command,
-                                                  current_status=0, start_date=None,
-                                                  end_date=None)
+        JobEntry.objects.filter(id=job_id).update(name=job_name, cron_string=job_cron, command_ipynb=job_command)
         return f'Job info updated.'
 
     @staticmethod
-    def create_entry(job):
+    def create_entry(job_data):
         """Create an entry in the job database depending on the."""
 
-        job_entry = JobEntry.objects.create(name=job.name, mode=job.mode, cron_string=job.cron_string,
-                                            command_ipynb=job.command_ipynb)
+        job_entry = JobEntry.objects.create(name=job_data['job_name'], mode=job_data['mode'],
+                                            cron_string=job_data['cron_string'],
+                                            command_ipynb=job_data['command_ipynb'])
         return job_entry
 

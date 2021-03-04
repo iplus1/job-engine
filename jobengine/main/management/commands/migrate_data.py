@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from main.internals.db_helper import DBHelper
-from main.internals.job import Job
 
 
 class Command(BaseCommand):
@@ -23,15 +22,10 @@ class Command(BaseCommand):
         all_entries = DBHelper.get_jobs()
         for job_entry in all_entries:
             try:
-                job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                          command_ipynb=job_entry['command_ipynb'], job_id=job_entry['id'])
-                output = ''
-                if os.path.isfile(f'{job.job_dir}/last_output'):
-                    with open(f'{job.job_dir}/last_output', 'r') as file:
-                        output = file.read()
-                DBHelper.update_running_and_std(job_entry['id'], job.check_if_running(), output)
+                if os.path.isdir(f'/jobengine/jobs/{job_entry["name"]}'):
+                    os.rename(f'/jobengine/jobs/{job_entry["name"]}', f'/jobengine/jobs/{job_entry["id"]}')
             except Exception as e:
                 print(f'[{timezone.now()}] Server Error: {e}')
-        return f'[{timezone.now()}] All jobs should be updated.'
+        return f'[{timezone.now()}] All jobs should be migrated.'
 
 

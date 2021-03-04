@@ -42,15 +42,7 @@ function fill_help_modal(title, body) {
     document.querySelector('#help_modal-body').innerHTML = body;
 }
 
-/**
- * Fill the edit modal with the correct content for the specific job.
- *
- * @param id: Expects an integer as the ID for the job.
- * @param name: Expects a string to insert as the name of the job.
- * @param mode: Expects a string to insert as the mode of the job.
- * @param cron: Expects a string to insert as the cron string of the job.
- * @param command_ipynb: Expects a string to insert as the command or ipynb of the job.
- */
+
 function fill_edit_modal(id, name, mode, cron, command_ipynb) {
     document.querySelector('#edit_job_id').value = id;
     document.querySelector('#edit_job_name').value = name;

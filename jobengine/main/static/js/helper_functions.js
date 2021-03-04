@@ -38,30 +38,24 @@ async function display_after_logs(text, id) {
  * @returns {Promise<void>}
  */
 async function display_edit(id, job_name, job_mode, job_cron, job_command) {
-    const notification_modal = document.querySelector("#notification_modal");
-    let body = `<br>Editing a running job will cause it to be <b>stopped</b> and the output will be <b>discarded</b>.<br> Do you want to continue?`;
-    fill_notification_modal('Edit Notification', body);
-    show_element(notification_modal);
-    if (await confirm_notification(notification_modal)) {
-        const edit_modal = document.querySelector('#edit_modal');
-        fill_edit_modal(id, job_name, job_mode, job_cron, job_command);
-        show_element(edit_modal);
-        const edit_mode = document.querySelector('#edit_mode');
-        const edit_cron_string = document.querySelector('#edit_cronstring');
-        const edit_ipynb_files = document.querySelector('#edit_ipynbfiles');
-        const edit_command = document.querySelector('#edit_command_div');
-        if (edit_mode.value === 'cmd' || edit_mode.value === 'ipynb') {
-            hide_element(edit_cron_string);
-        } else {
-            show_element(edit_cron_string);
-        }
-        if (!edit_mode.value.includes('ipynb')) {
-            hide_element(edit_ipynb_files);
-            show_element(edit_command);
-        } else {
-            show_element(edit_ipynb_files);
-            hide_element(edit_command);
-        }
+    const edit_modal = document.querySelector('#edit_modal');
+    fill_edit_modal(id, job_name, job_mode, job_cron, job_command);
+    show_element(edit_modal);
+    const edit_mode = document.querySelector('#edit_mode');
+    const edit_cron_string = document.querySelector('#edit_cronstring');
+    const edit_ipynb_files = document.querySelector('#edit_ipynbfiles');
+    const edit_command = document.querySelector('#edit_command_div');
+    if (edit_mode.value === 'cmd' || edit_mode.value === 'ipynb') {
+        hide_element(edit_cron_string);
+    } else {
+        show_element(edit_cron_string);
+    }
+    if (!edit_mode.value.includes('ipynb')) {
+        hide_element(edit_ipynb_files);
+        show_element(edit_command);
+    } else {
+        show_element(edit_ipynb_files);
+        hide_element(edit_command);
     }
 }
 

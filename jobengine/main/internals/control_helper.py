@@ -8,18 +8,25 @@ from main.internals.job import Job
 
 class ControlHelper:
 
-    def __init__(self, job, action, job_id=None, job_new_data=None):
+    def __init__(self, job_data, action, job_new_data=None):
         """Constructor for the ControlHelper.
 
-        :param job: Job-Object: main.internals.job.
+        :param job_data: dict: contains the data necessary for a job.
         :param action: string: specifies an action.
-        :param job_id: int: indicates the ID of a job.
+        :param job_new_data: dic: contains the data necessary to change a jobs information.
         """
 
-        self.job = job
-        self.job_id = job_id
         self.action = action
         self.job_new_data = job_new_data
+
+        if self.action == 'create':
+            job_entry = DBHelper.create_entry(job_data)
+            self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
+                           command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
+        else:
+            job_entry = DBHelper.get_job_by_id(job_data['id'])
+            self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
+                           command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
 
     def perform_action(self):
         """Execute a specific function depending on the 'action' parameter.
@@ -33,11 +40,7 @@ class ControlHelper:
         """
 
         try:
-            if self.action == 'create':
-                DBHelper.create_entry(self.job)
-                return self.create()
-
-            elif self.action == 'delete':
+            if self.action == 'delete':
                 return self.delete()
 
             elif self.action == 'start':
@@ -88,7 +91,7 @@ class ControlHelper:
         :return: Message of completed delete action.
         """
 
-        DBHelper.delete_entry(self.job_id)
+        DBHelper.delete_entry(self.job.id)
         self.job.kill_process()
         self.job.delete_job_dir()
         if 'cron' in self.job.mode:
@@ -117,7 +120,7 @@ class ControlHelper:
         """
 
         if self.job.kill_process():
-            DBHelper.update_current_status_name(self.job.name, 137)
+            DBHelper.stop_process(self.job.id)
             return f'<b>{self.job.name}:</b> is now stopped.'
         else:
             return f'<b>{self.job.name}:</b> is not running.'
@@ -159,22 +162,20 @@ class ControlHelper:
         :return: Status of the edit() function
         :rtype: str
         """
-        self.stop()
-        self.job.delete_job_dir()
+
         if 'cron' in self.job.mode:
             self.job.delete_cron()
         else:
             self.job_new_data['cron_string'] = ''
 
-        DBHelper.edit_job(self.job_id, self.job_new_data['name'], self.job_new_data['cron_string'],
+        DBHelper.edit_job(self.job.id, self.job_new_data['name'], self.job_new_data['cron_string'],
                           self.job_new_data['command_ipynb'])
 
+        """Start the new job depending on its mode"""
         self.job = Job(name=self.job_new_data['name'], mode=self.job.mode, cron_string=self.job_new_data['cron_string'],
-                       command_ipynb=self.job_new_data['command_ipynb'])
-
+                       command_ipynb=self.job_new_data['command_ipynb'], job_id=self.job.id)
         if 'cron' in self.job.mode:
             self.job.create_cron()
-
         if 'ipynb' in self.job.mode:
             self.job.copy_ipynb_file()
 

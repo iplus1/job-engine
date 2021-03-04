@@ -14,7 +14,6 @@ from main.internals.job import Job
 
 WORK_DIR = '/jobengine/ipynbs'
 
-
 @ensure_csrf_cookie
 def index(request):
     """Return the index.html template with the necessary context.
@@ -44,7 +43,7 @@ def index(request):
                     ipynb_files.append(join(root, filename))
 
     context = {
-        'nbs': ipynb_files
+        'nbs': sorted(ipynb_files)
     }
     return TemplateResponse(request, 'index.html', context)
 
@@ -116,7 +115,7 @@ def get_log(request):
         log_file = request.GET["log_file"]
         job_entry = DBHelper.get_job_by_id(job_id)
         job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
-                  command_ipynb=job_entry.command_ipynb)
+                  command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
         return HttpResponse(job.get_log(log_file))
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
@@ -135,7 +134,7 @@ def create_job(request):
         'mode': string;
         'cron_string': string;
         'command': string;
-        'ipynb_file': string
+        'ipynb_file': string;
 
     :return: Status of the perform_action() function.
     :exception Exception if try fails. Printed to the terminal and returned as HttpResponse.:
@@ -144,19 +143,14 @@ def create_job(request):
     try:
         raw_data = request.read()
         json_data = json.loads(raw_data)
-        job_name = json_data['job_name'].rstrip()
-        mode = json_data['mode']
-        cron_string = json_data['cron_string']
-        command = json_data['command']
-        ipynb_file = json_data['ipynb_file']
-        if ControlHelper.check_special_characters(job_name):
+        if ControlHelper.check_special_characters(json_data['job_name'].rstrip()):
             raise Exception('Forbidden character found in job_name')
-        if 'ipynb' in mode:
-            command_ipynb = ipynb_file
+        if 'ipynb' in json_data['mode']:
+            json_data['command_ipynb'] = json_data['ipynb_file']
         else:
-            command_ipynb = command
-        job = Job(name=job_name, mode=mode, cron_string=cron_string, command_ipynb=command_ipynb)
-        return HttpResponse(ControlHelper(job, 'create').perform_action())
+            json_data['command_ipynb'] = json_data['command']
+        ControlHelper(json_data, 'create')
+        return HttpResponse(f'<b>{json_data["job_name"]}</b> has been created as a {json_data["mode"]}-job.')
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
         return HttpResponse(f'[{timezone.now()}] Server Error: {e}')
@@ -199,11 +193,9 @@ def control_job(request):
         raw_data = request.read()
         json_data = json.loads(raw_data)
         job_entry = DBHelper.get_job_by_id(json_data['id'])
-        job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
-                  command_ipynb=job_entry.command_ipynb)
 
         if json_data['action'] == 'logs':
-            context = ControlHelper(job, json_data['action'], job_entry.id).perform_action()
+            context = ControlHelper(json_data, json_data['action']).perform_action()
             return TemplateResponse(request, 'logs_selection.html', context)
 
         elif json_data['action'] == 'edit':
@@ -218,10 +210,10 @@ def control_job(request):
                 'cron_string': json_data['cron_string'],
                 'command_ipynb': command_ipynb
             }
-            return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id, job_new_data).perform_action())
+            print(f'This is the data of job_new_data ${job_new_data}')
+            return HttpResponse(ControlHelper(json_data, json_data['action'], job_new_data).perform_action())
         else:
-            return HttpResponse(ControlHelper(job, json_data['action'], job_entry.id).perform_action())
+            return HttpResponse(ControlHelper(json_data, json_data['action']).perform_action())
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
         return HttpResponse(f'[{timezone.now()}] Server Error: {e}')
-

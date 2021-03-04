@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         """Create a parser to handle arguments."""
 
-        parser.add_argument('job_name', type=str)
+        parser.add_argument('job_id', type=str)
         parser.add_argument('return_code', type=int)
         parser.add_argument('job_state', type=str)
 
@@ -29,9 +29,10 @@ class Command(BaseCommand):
         try:
             # Clear the last_output file for a new start
             if options['job_state'] == 'start':
-                open(f'{BASE_DIR}/jobs/{options["job_name"]}/last_output', 'w').close()
-            DBHelper.update_state_name(options['job_name'], options['return_code'], options['job_state'])
+                open(f'{BASE_DIR}/jobs/{options["job_id"]}/last_output', 'w').close()
+            DBHelper.update_state_id(options['job_id'], options['return_code'], options['job_state'])
         except Exception as e:
             print(f'[{timezone.now()}] Server Error: {e}')
-            return f'An Error occurred while making the database entry for job: {options["job_name"]}'
+            return f'An Error occurred while making the database entry for job: {options["job_id"]}'
+
 
