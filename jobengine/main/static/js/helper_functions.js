@@ -31,15 +31,15 @@ async function display_after_logs(text, id) {
 }
 
 /**
- * Display a selection of available log-files for the job.
+ * Display an edit-window for the job.
  *
- * @param text: Expects the selection of available logs as a string.
  * @param id: Expects an integer with the id of the job.
  * @returns {Promise<void>}
  */
-async function display_edit(id, job_name, job_mode, job_cron, job_command) {
+async function display_edit(id) {
     const edit_modal = document.querySelector('#edit_modal');
-    fill_edit_modal(id, job_name, job_mode, job_cron, job_command);
+    const row_data = Tabulator.prototype.findTable('#job_table')[0].getRow(id).getData();
+    fill_edit_modal(id, row_data.name, row_data.mode, row_data.cron_string, row_data.command_ipynb);
     show_element(edit_modal);
     const edit_mode = document.querySelector('#edit_mode');
     const edit_cron_string = document.querySelector('#edit_cronstring');
@@ -88,13 +88,13 @@ function get_help(helper) {
  *
  * @param action: Expect a string that specifies the requested action.
  * @param id: Expects an integer with the id of the job.
- * @param job_name: Expects a string with the name of the job.
  * @returns {Promise<void>}
  */
-async function trigger_action(action, id, job_name) {
+async function trigger_action(action, id) {
     if (action !== 'logs') {
+        const row_data = Tabulator.prototype.findTable('#job_table')[0].getRow(id).getData();
         const notification_modal = document.querySelector("#notification_modal");
-        const body = `<br> <b>Job:</b> ${job_name} <br> <b>Action:</b> ${action}`;
+        const body = `<br> <b>Job:</b> ${row_data.name} <br> <b>Action:</b> ${action}`;
         fill_notification_modal('Confirm Action', body);
         show_element(notification_modal);
         if (await confirm_notification(notification_modal)) {
