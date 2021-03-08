@@ -80,11 +80,10 @@ function job_table() {
                 width: 100,
                 cellClick: (e, cell) => on_cell_click(cell),
                 formatter: (cell) => {
-                    const enabled = cell.getRow().getData().enabled ? 'Enabled' : 'Disabled';
                     if (cell.getValue() === true) {
-                        return `Yes, ${enabled}`;
+                        return `Yes`;
                     } else {
-                        return `No, ${enabled}`;
+                        return `No`;
                     }
                 }
             },
