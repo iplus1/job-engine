@@ -23,6 +23,7 @@ class ControlHelper:
             job_entry = DBHelper.create_entry(job_data)
             self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
                            command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
+
         else:
             job_entry = DBHelper.get_job_by_id(job_data['id'])
             self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
@@ -61,6 +62,12 @@ class ControlHelper:
             elif self.action == 'edit':
                 return self.edit()
 
+            elif self.action == 'enable' and 'cron' in self.job.mode:
+                return self.enable()
+
+            elif self.action == 'disable' and 'cron' in self.job.mode:
+                return self.disable()
+
         except Exception as e:
             print(f'[{timezone.now()}] Server Error: {e}')
             return f'[{timezone.now()}] Server Error: {e} with {self.job.name}'
@@ -75,11 +82,13 @@ class ControlHelper:
         if self.job.mode == 'cron':
             return self.job.create_cron()
         elif self.job.mode == 'cron ipynb':
-            return self.job.create_ipynb_cron()
+            self.job.copy_ipynb_file()
+            return self.job.create_cron()
         elif self.job.mode == 'cmd':
             return self.job.create_cmd()
         elif self.job.mode == 'ipynb':
-            return self.job.create_ipynb_cmd()
+            self.job.copy_ipynb_file()
+            return self.job.create_cmd()
 
     def delete(self):
         """Delete the database entry of a job and execute necessary delete_ functions.
@@ -180,6 +189,20 @@ class ControlHelper:
             self.job.copy_ipynb_file()
 
         return f'<b>{self.job.name}:</b> The job info has been modified.'
+
+    def enable(self):
+        """Enables a cron-job."""
+
+        DBHelper.update_enabled(self.job.id, True)
+        self.create()
+        return f'<b>{self.job.name}:</b> The job has been enabled.'
+
+    def disable(self):
+        """Disables a cron-job."""
+
+        DBHelper.update_enabled(self.job.id, False)
+        self.job.delete_cron()
+        return f'<b>{self.job.name}:</b> The job has been disabled.'
 
     @staticmethod
     def check_special_characters(string):

@@ -14,4 +14,4 @@ class JobEntry(models.Model):
     output = models.CharField(null=True, max_length=512, default=None)
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
-
+    enabled = models.BooleanField(default=True)

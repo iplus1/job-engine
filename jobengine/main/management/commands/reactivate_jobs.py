@@ -37,12 +37,14 @@ class Command(BaseCommand):
         if len(all_crons) > 0:
             for job_entry in all_crons:
                 try:
-                    job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
-                              command_ipynb=job_entry['command_ipynb'], job_id=job_entry['id'])
-                    if 'ipynb' in job.mode:
-                        print(f'[{timezone.now()}]{job.create_ipynb_cron()}')
-                    else:
+                    if job_entry['enabled']:
+                        job = Job(name=job_entry['name'], mode=job_entry['mode'], cron_string=job_entry['cron_string'],
+                                  command_ipynb=job_entry['command_ipynb'], job_id=job_entry['id'])
+                        if 'ipynb' in job.mode:
+                            job.copy_ipynb_file()
                         print(f'[{timezone.now()}]{job.create_cron()}')
+                    else:
+                        print(f'[{timezone.now()}] Skipping {job_entry["name"]} because its disabled.')
                 except Exception as e:
                     print(f'[{timezone.now()}] Server Error: {e}')
             print(f'[{timezone.now()}] All jobs should be restarted.')

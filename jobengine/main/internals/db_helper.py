@@ -58,11 +58,18 @@ class DBHelper:
         return f'Job running updated.'
 
     @staticmethod
-    def update_running_name(job_name, job_running):
-        """Update the running state of a job by its name."""
+    def update_running(job_id, job_running):
+        """Update the running state of a job by its ID."""
 
-        JobEntry.objects.filter(name=job_name).update(running=job_running)
+        JobEntry.objects.filter(name=job_id).update(running=job_running)
         return f'Job running updated.'
+
+    @staticmethod
+    def update_enabled(job_id, enabled):
+        """Update the enabled state of a job by its ID."""
+
+        JobEntry.objects.filter(id=job_id).update(enabled=enabled)
+        return f'Job enabled update.'
 
     @staticmethod
     def update_current_status(job_id, job_status):
@@ -119,7 +126,7 @@ class DBHelper:
                 print(f'[{timezone.now()}] Server Error: {e}')
                 return f'[{timezone.now()}] Server Error: {e}'
         return f'All STDs updated.'
-    
+
     @staticmethod
     def stop_process(job_id):
         """Mirror the stop of a process by changing the status to 137 and the end date to current"""

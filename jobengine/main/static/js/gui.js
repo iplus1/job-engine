@@ -84,9 +84,12 @@ function status_button(status) {
  * @param data: Expects an object containing the data of a cell in the job-table.
  * @returns {string}: Contains all necessary buttons for a cell in the job-table.
  */
+
 function generate_control(data) {
     let control_action = '';
     let control_action_color = '';
+    let control_action_enable = '';
+    let control_action_enable_color = '';
     if (data['running'] === true) {
         control_action = 'Stop';
         control_action_color = 'btn-warning';
@@ -99,11 +102,20 @@ function generate_control(data) {
     let update_btn = ``;
     let logs = ``;
     let start_stop_btn = ``;
-
+    let enable_btn = ``;
     if (data['mode'] === 'cmd' || data['mode'] === 'ipynb' || (data['mode'].includes('cron') && data['running'] === true)) {
         start_stop_btn = `<input type="button"  class="btn ${control_action_color} btn-xs" value="${control_action}" onclick="trigger_action('${control_action.toLowerCase()}','${data['id']}')"/>`;
     }
-
+    if (data['mode'].includes('cron')) {
+        if (data['enabled'] === true) {
+            control_action_enable = 'Disable';
+            control_action_enable_color = 'btn-warning';
+        } else {
+            control_action_enable = 'Enable';
+            control_action_enable_color = 'btn-success';
+        }
+        enable_btn = `<input type="button"  class="btn ${control_action_enable_color} btn-xs" value="${control_action_enable}" onclick="trigger_action('${control_action_enable.toLocaleLowerCase()}','${data['id']}')"/> `;
+    }
     if (data['mode'].includes('ipynb')) {
         cleanup_btn = `<input type="button" class="btn btn-info btn-xs" value="Cleanup" onclick="trigger_action('cleanup','${data['id']}')"/>`;
         update_btn = `<input type="button" class="btn btn-info btn-xs" value="Update" onclick="trigger_action('update','${data['id']}')"/>`;
@@ -111,5 +123,5 @@ function generate_control(data) {
     }
     const delete_btn = `<input type="button" class="btn btn-danger btn-xs" value="Delete" onclick="trigger_action('delete','${data['id']}')"/>`;
     const edit_btn = `<input type="button" class="btn btn-info btn-xs" value="Edit" onclick="display_edit('${data['id']}')"/>`;
-    return `<span>${edit_btn} ${delete_btn} ${start_stop_btn} ${cleanup_btn} ${update_btn} ${logs}</span>`;
+    return `<span>${edit_btn} ${delete_btn} ${enable_btn} ${start_stop_btn} ${cleanup_btn} ${update_btn} ${logs}</span>`;
 }

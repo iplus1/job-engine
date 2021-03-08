@@ -85,22 +85,6 @@ class Job:
         self.cron.write()
         return f'<b>{self.name}</b> has been started as a {self.mode}-job.'
 
-    def create_ipynb_cron(self):
-        """Create an entry in the Crontab with a command of the Job specific for ipynb.
-
-        Copies the needed source file for the Job to the Job directory with `copy_ipynb_file()`.
-        The CronTab places a unique Identifier with the Job name
-        at the end of the Cronline as a comment.
-
-        :return: Status of the started ipynb-Cron-Job
-        """
-
-        self.copy_ipynb_file()
-        job = self.cron.new(command=self.build_command(), comment=f'Identifier: {self.id}')
-        job.setall(self.cron_string)
-        self.cron.write()
-        return f'<b>{self.name}</b> has been started as a {self.mode}-job.'
-
     def create_cmd(self):
         """Create a command for the Job and execute it.
 
@@ -110,22 +94,6 @@ class Job:
         """
 
         if not self.check_if_running():
-            command = self.build_command()
-            subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
-            return f'<b>{self.name}:</b> has been started as a {self.mode}-job.'
-        else:
-            return f'<b>{self.name}:</b> is still running.'
-
-    def create_ipynb_cmd(self):
-        """Create a command for the Job specific for ipynb and execute it.
-
-        Checks if a process with the same PID is already running.
-
-        :return: Status of the started ipynb-cmd-Job.
-        """
-
-        if not self.check_if_running():
-            self.copy_ipynb_file()
             subprocess.Popen(self.build_command(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
             return f'<b>{self.name}:</b> has been started as a {self.mode}-job.'
         else:
