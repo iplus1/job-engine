@@ -18,7 +18,8 @@ class ControlHelper:
 
         self.action = action
         self.job_new_data = job_new_data
-
+        
+        """To avoid lifecycle problems the database entry has to exist before creating the job-object."""
         if self.action == 'create':
             job_entry = DBHelper.create_entry(job_data)
             self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
@@ -31,9 +32,6 @@ class ControlHelper:
 
     def perform_action(self):
         """Execute a specific function depending on the 'action' parameter.
-
-        In the special case of the 'create' action a database entry is created
-        before the function create() is being executed.
 
         :return: Value of the invoked function.
         :rtype: str

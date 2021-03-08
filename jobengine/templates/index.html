@@ -34,7 +34,9 @@
                             <div class="form-group">
                                 <label for="job_name" class="control-label col-sm-3">Name:</label>
                                 <div class="col-sm-3">
-                                        <input type="text" name="job_name" id="job_name" class="form-control" value="" pattern="[a-zA-Z0-9_\-\s+]*" title="Only letters, numbers, '_' and '-' allowed" required>
+                                    <input type="text" name="job_name" id="job_name" class="form-control" value=""
+                                           pattern="[a-zA-Z0-9_\-\s+]*"
+                                           title="Only letters, numbers, '_' and '-' allowed" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -101,75 +103,77 @@
         </div>
     </div>
 
-        <!-- Edit Modal -->
-        <div id="edit_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
-            <div id="edit_modal-dialog" class="modal-dialog" role="dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 id="edit_modal-title" class="modal-title">Edit Job</h3>
-                        <button type="button" class="close" aria-label="Close">
-                            <span id="edit_modal-tic" aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div id="create_modal-body" class="modal-body">
-                        <form id="edit_job_form" action="control_job" class="form-horizontal" name="edit_job_form">
-                            <input type="number" name="id" id="edit_job_id" class="hidden" value="">
-                            <div class="form-group">
-                                <label for="edit_job_name" class="control-label col-sm-3">Name:</label>
-                                <div class="col-sm-3">
-                                        <input type="text" name="job_name" id="edit_job_name" class="form-control" value="" pattern="[a-zA-Z0-9_\-\s+]*" title="Only letters, numbers, '_' and '-' allowed" required>
-                                </div>
+
+    <!-- Edit Modal -->
+    <div id="edit_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
+        <div id="edit_modal-dialog" class="modal-dialog" role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="edit_modal-title" class="modal-title">Edit Job</h3>
+                    <button type="button" class="close" aria-label="Close">
+                        <span id="edit_modal-tic" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="create_modal-body" class="modal-body">
+                    <form id="edit_job_form" action="control_job" class="form-horizontal" name="edit_job_form">
+                        <input type="number" name="id" id="edit_job_id" class="hidden" value="">
+                        <div class="form-group">
+                            <label for="edit_job_name" class="control-label col-sm-3">Name:</label>
+                            <div class="col-sm-3">
+                                <input type="text" name="job_name" id="edit_job_name" class="form-control" value=""
+                                       pattern="[a-zA-Z0-9_\-\s+]*" title="Only letters, numbers, '_' and '-' allowed"
+                                       required>
                             </div>
-                            <div class="form-group">
-                                <label for="edit_mode" class="control-label col-sm-3">Mode Selection: <a href="#"
-                                                                                                    onclick="get_help('mode_help_holder')"><span
-                                        class="glyphicon glyphicon-question-sign"></span></a></label>
-                                <div class="col-sm-3">
-                                    <input name="mode" id="edit_mode" class="form-control  mb-2 mr-sm-2 mb-sm-0" readonly>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_mode" class="control-label col-sm-3">Mode Selection: <a href="#"
+                                                                                                     onclick="get_help('mode_help_holder')"><span
+                                    class="glyphicon glyphicon-question-sign"></span></a></label>
+                            <div class="col-sm-2">
+                                <input name="mode" id="edit_mode" class="form-control  mb-2 mr-sm-2 mb-sm-0" readonly>
                             </div>
-                            <div class="form-group" id="edit_ipynbfiles">
-                                <label for="edit_ipynb_file" class="control-label col-sm-3">Jupyter Notebook:</label>
-                                <div class="col-sm-6">
-                                    <select name="ipynb_file" id="edit_ipynb_file" size="1" class="form-control">
-                                        <option> -- select an ipynb --</option>
-                                        {% for nb in nbs %}
-                                            <option>{{ nb }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="form-group" id="edit_ipynbfiles">
+                            <label for="edit_ipynb_file" class="control-label col-sm-3">Jupyter Notebook:</label>
+                            <div class="col-sm-6">
+                                <select name="ipynb_file" id="edit_ipynb_file" size="1" class="form-control">
+                                    <option> -- select an ipynb --</option>
+                                    {% for nb in nbs %}
+                                        <option>{{ nb }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="form-group" id="edit_cronstring">
-                                <label for="edit_cron_string" class="control-label col-sm-3">Cron String: <a href="#"
-                                                                                                        onclick="get_help('cron_help_holder')"><span
-                                        class="glyphicon glyphicon-question-sign"></span></a></label>
-                                <div class="col-sm-2">
-                                    <input type="text" name="cron_string" id="edit_cron_string"
-                                           class="form-control  mb-2 mr-sm-2 mb-sm-0" maxlength="30" value="* * * * *">
-                                </div>
+                        </div>
+                        <div class="form-group" id="edit_cronstring">
+                            <label for="edit_cron_string" class="control-label col-sm-3">Cron String: <a href="#"
+                                                                                                         onclick="get_help('cron_help_holder')"><span
+                                    class="glyphicon glyphicon-question-sign"></span></a></label>
+                            <div class="col-sm-2">
+                                <input type="text" name="cron_string" id="edit_cron_string"
+                                       class="form-control  mb-2 mr-sm-2 mb-sm-0" maxlength="30" value="* * * * *">
                             </div>
-                            <div class="form-group" id="edit_command_div">
-                                <label for="edit_command" class="control-label col-sm-3">Command: </label>
-                                <div class="col-sm-8">
-                                    <input type="text" name="command" id="edit_command"
-                                           class="form-control  mb-2 mr-sm-2 mb-sm-0" value="">
-                                </div>
+                        </div>
+                        <div class="form-group" id="edit_command_div">
+                            <label for="edit_command" class="control-label col-sm-3">Command: </label>
+                            <div class="col-sm-8">
+                                <input type="text" name="command" id="edit_command"
+                                       class="form-control  mb-2 mr-sm-2 mb-sm-0" value="">
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="submit_edit" type="submit" form="edit_job_form"
-                                class="close-modal btn btn-primary notification_modal-ok">Save
-                        </button>
-                        <button id="edit_modal-close" type="button"
-                                class="close-modal btn btn-secondary notification_modal-close" data-dismiss="modal">
-                            Close
-                        </button>
-                    </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="submit_edit" type="submit" form="edit_job_form"
+                            class="close-modal btn btn-primary notification_modal-ok">Save
+                    </button>
+                    <button id="edit_modal-close" type="button"
+                            class="close-modal btn btn-secondary notification_modal-close" data-dismiss="modal">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
-
+    </div>
 
     <!-- Notification Modal -->
     <div id="notification_modal" class="modal" tabindex="-1" role="dialog" style="display: none">
@@ -231,7 +235,8 @@
         The output is also viewable as an html file that gets created while converting the notebook.<br>
         <b>ipynb cron</b>
         executes the notebook regularly. This is similar to starting the whole notebook in the Jupyter IDE. The output
-        is written to an html that can be accessed via the log button or into the output column. Create a cron string as follows:
+        is written to an html that can be accessed via the log button or into the output column. Create a cron string as
+        follows:
         <pre>
      ┌───────────── minute (0 - 59)
      │ ┌───────────── hour (0 - 23)
@@ -275,9 +280,17 @@
         </p>
         <br>
         <pre>
+ <input type="button" class="btn btn-info btn-xs" value="Edit">      : Open a window to edit a jobs information.
+
+ <input type="button" class="btn btn-danger btn-xs" value="Delete">    : Delete a job and every associated (Crontab, Directory, Process).
+
+ <input type="button" class="btn btn-success btn-xs" value="Enable">    : Enable a Cron-Job, which effectively writes it to the Crontab.
+
+ <input type="button" class="btn btn-warning btn-xs" value="Disable">   : Disable a Cron-Job, which effectively deletes it from the Crontab.
+
  <input type="button" class="btn btn-success btn-xs" value="Start">     : Start the execution of a job.
 
- <input type="button" class="btn btn-danger btn-xs" value="Stop">      : Stop the execution of a job.
+ <input type="button" class="btn btn-warning btn-xs" value="Stop">      : Stop the execution of a job.
 
  <input type="button" class="btn btn-info btn-xs" value="Cleanup">   : Cleanup the job directory by deleting all logfiles.
 
@@ -286,8 +299,6 @@
               The Update function updates the script the Job is using.
 
  <input type="button" class="btn btn-info btn-xs" value="Logs">      : Show all available log files of a job.
-
- <input type="button" class="btn btn-danger btn-xs" value="Delete">    : Delete a job and every associated (Crontab, Directory, Process).
     </pre>
     </div>
 
@@ -315,3 +326,4 @@
     </div>
 
 {% endblock 'body' %}
+
