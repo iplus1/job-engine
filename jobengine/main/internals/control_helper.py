@@ -24,7 +24,7 @@ class ControlHelper:
             job_entry = DBHelper.create_entry(job_data)
             self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
                            command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
-
+            self.create()
         else:
             job_entry = DBHelper.get_job_by_id(job_data['id'])
             self.job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
