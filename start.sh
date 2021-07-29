@@ -4,6 +4,7 @@ set -o pipefail
 
 source /common
 
+export PATH="/usr/local/bin:$PATH"
 printenv > /etc/environment
 
 DBDIR=/jobengine/db
