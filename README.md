@@ -12,7 +12,7 @@ Jobengine is an open-source docker container that helps you to easily create, ma
 ## Quickstart
 
 ````shell script
-$ docker run --name=my-jobengine -p 8010:8010 iplus1/job-engine:0.0.4
+$ docker run --name=my-jobengine -p 8010:8010 iplus1/job-engine:0.0.5
 ````
 
 Additional arguments:
