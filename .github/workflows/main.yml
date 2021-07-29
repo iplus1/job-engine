@@ -2,6 +2,7 @@ name: Docker Image CI
 
 on:
   release:
+    branches: [ main ]
     tags:
       - '*.*.*'
 
