@@ -4,7 +4,6 @@ set -o pipefail
 
 source /common
 
-export PATH="/usr/local/bin:$PATH"
 printenv > /etc/environment
 
 DBDIR=/jobengine/db
@@ -27,13 +26,16 @@ sed -i "s#___DBFILE___#$DBFILE#" /var/www/jobengine/jobengine/settings.py
 cd /var/www/jobengine/
 
 info "Make migrations"
-venv/bin/python manage.py makemigrations && venv/bin/python manage.py migrate --run-syncdb --no-input
+venv/bin/python manage.py makemigrations && venv/bin/python manage.py migrate --no-input
 
 info "Collecting static files."
 venv/bin/python manage.py collectstatic --no-input
 
 info "Starting Cron"
 service cron restart
+
+info "Looking for jobs to migrate..."
+venv/bin/python manage.py migrate_data
 
 info "Looking for jobs to restart..."
 venv/bin/python manage.py reactivate_jobs
