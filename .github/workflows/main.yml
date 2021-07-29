@@ -1,8 +1,9 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ main ]
+  release:
+    tags:
+      - '*.*.*'
 
 jobs:
 
@@ -17,4 +18,4 @@ jobs:
     - name: Build the Docker image
       run: |
         echo $RELEASE_VERSION
-
+        echo $GITHUB_REF
