@@ -23,6 +23,7 @@ sed -i "s/^#SECRET_KEY = .*$/SECRET_KEY = '$SECRET'/" /var/www/jobengine/jobengi
 
 sed -i "s#___DBFILE___#$DBFILE#" /var/www/jobengine/jobengine/settings.py
 
+chmod +x /jobengine/scripts/*.sh
 cd /var/www/jobengine/
 
 info "Make migrations"

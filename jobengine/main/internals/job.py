@@ -273,11 +273,11 @@ class Job:
             base_command = f'{nb_convert} && {log_creation}'
             garbage_collector = f'find {escaped_job_dir}/{self.job_file}.*.html -mmin +30 -exec rm {{}} \\;'
             ipynb_command = f'{base_command} && {garbage_collector}'
-            full_command = f'/jobengine/wrapper.sh "{self.id}" "{ipynb_command} ; {status_code} ; {update_status}"'
+            full_command = f'/jobengine/wrapper.sh "{self.id}" "{ipynb_command} ; {status_code} ; {update_status}" "{escaped_job_dir}/{self.job_file}"'
             return full_command
         else:
             escaped_command = self.command_ipynb.replace('"', r'\"').replace('$', r'\$')
-            full_command = f'/jobengine/wrapper.sh "{self.id}" "{escaped_command} ; {status_code} ; {update_status}"'
+            full_command = f'/jobengine/wrapper.sh "{self.id}" "{escaped_command} ; {status_code} ; {update_status}" "{escaped_command}"'
             return full_command
 
 

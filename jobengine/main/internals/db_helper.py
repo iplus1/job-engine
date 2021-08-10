@@ -148,6 +148,9 @@ class DBHelper:
     def create_entry(job_data):
         """Create an entry in the job database depending on the."""
 
+        if 'cron' not in job_data['mode']:
+            job_data['cron_string'] = ''
+
         job_entry = JobEntry.objects.create(name=job_data['job_name'], mode=job_data['mode'],
                                             cron_string=job_data['cron_string'],
                                             command_ipynb=job_data['command_ipynb'])
