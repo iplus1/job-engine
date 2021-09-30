@@ -23,7 +23,13 @@ sed -i "s/^#SECRET_KEY = .*$/SECRET_KEY = '$SECRET'/" /var/www/jobengine/jobengi
 
 sed -i "s#___DBFILE___#$DBFILE#" /var/www/jobengine/jobengine/settings.py
 
-chmod +x /jobengine/scripts/*.sh
+info "Check if scripts directory is mounted..."
+if [ -d /jobengine/scripts/ ]; then
+    chmod +x /jobengine/scripts/*.sh
+else
+    info "No scripts directory mounted."
+fi
+
 cd /var/www/jobengine/
 
 info "Make migrations"
