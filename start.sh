@@ -25,7 +25,14 @@ sed -i "s#___DBFILE___#$DBFILE#" /var/www/jobengine/jobengine/settings.py
 
 info "Check if scripts directory is mounted..."
 if [ -d /jobengine/scripts/ ]; then
-    chmod +x /jobengine/scripts/*.sh
+    shopt -s nullglob dotglob
+    files=(/jobengine/scripts/*)
+    if [ ${#files[@]} -gt 0 ]; then
+        info "No scripts are mounted."
+        chmod +x /jobengine/scripts/*.sh
+    else
+        info "Scripts should now be executable."
+    fi
 else
     info "No scripts directory mounted."
 fi
