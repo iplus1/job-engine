@@ -28,10 +28,10 @@ if [ -d /jobengine/scripts/ ]; then
     shopt -s nullglob dotglob
     files=(/jobengine/scripts/*)
     if [ ${#files[@]} -gt 0 ]; then
-        info "No scripts are mounted."
         chmod +x /jobengine/scripts/*.sh
-    else
         info "Scripts should now be executable."
+    else
+        info "No scripts in the directory."
     fi
 else
     info "No scripts directory mounted."
