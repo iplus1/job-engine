@@ -1,0 +1,7 @@
+<select name="html_output" id="html_output" size="1" class="form-control">
+    <option disabled> -- select a html output --</option>
+    {% for output in outputs %}
+        <option>{{ output }}</option>
+    {% endfor %}
+</select>
+

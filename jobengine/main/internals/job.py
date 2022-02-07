@@ -122,21 +122,25 @@ class Job:
             return f'The Job Dir and Files for <b>{self.name}</b> have been deleted.'
         return f'<b>{self.name}:</b> No Job Dir found.'
 
-    def cleanup_job_dir(self):
+    def cleanup_job_dir(self, action):
         """Clean the Job directory of all log files by deleting them.
 
         :return: Status of the directory cleaning.
         """
-
+        mode = action.split(';')[1]
         if os.path.exists(self.job_dir):
-            file_list = glob.glob(f'{self.job_dir}/{self.job_file}.*.html')
-            for file in file_list:
-                os.remove(file)
-            return f'<b>{self.name}:</b> Job dir is now cleaned up.'
+            if mode == 'all' or mode == 'html':
+                file_list = glob.glob(f'{self.job_dir}/{self.job_file}.*.html')
+                for file in file_list:
+                    os.remove(file)
+            if mode == 'all' or mode == 'logs':
+                with open(f'{self.job_dir}/logs', 'w') as file:
+                    file.write('')
+            return f'<b>{self.name}:</b> Job dir: {mode} is now cleaned up. '
         else:
             return f'<b>{self.name}:</b> No Job Dir found.'
 
-    def get_logs(self):
+    def get_html_outputs(self):
         """Get all log file names and append them to a list.
 
         :return: list containing all log file names or status of the fetching.
@@ -144,33 +148,50 @@ class Job:
 
         if os.path.exists(self.job_dir):
             path_list = glob.glob(f'{self.job_dir}/{self.job_file}.*.html')
-            data = {'logs': []}
+            data = {'outputs': []}
             for path in path_list:
-                data['logs'].append(ntpath.basename(path))
-            data['logs'].sort()
+                data['outputs'].append(ntpath.basename(path))
+            data['outputs'].sort()
             return data
         else:
             return f'<b>{self.name}:</b> Job dir doesnt exist'
 
-    def get_log(self, file):
-        """Get a specific log file.
+    def get_html_output(self, file):
+        """Get a specific html_output file.
 
         Takes in the file name to search for and read in.
 
-        :param file: string: name of the log file.
-        :return: log file content.
+        :param file: string: name of the html_output file.
+        :return: html_output file content.
         """
+        if 'select a html output' in file:
+            raise FileNotFoundError(f'Make sure to select a file.')
 
         file = f'{self.job_dir}/{file}'
         if os.path.exists(file):
             if file.endswith('.html'):
                 try:
-                    with open(file, 'r') as log:
-                        out = log.read()
-                    return out
+                    with open(file, 'r') as html_output:
+                        return html_output.read()
                 except Exception as e:
                     print(f'[{timezone.now()}] Server Error: {e}')
                     return f'[{timezone.now()}] Server Error: {e} with {self.name}'
+        else:
+            raise FileNotFoundError(f"File: {file} was not found.")
+
+    def get_logs(self):
+        """Get the logs file of a job.
+
+        :return: logs file content.
+        """
+        file = f'{self.job_dir}/logs'
+        if os.path.exists(file):
+            try:
+                with open(file, 'r') as logs:
+                    return logs.read()
+            except Exception as e:
+                print(f'[{timezone.now()}] Server Error: {e}')
+                return f'[{timezone.now()}] Server Error: {e} with {self.name}'
         else:
             raise FileNotFoundError(f"File: {file} was not found.")
 

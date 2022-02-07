@@ -63,15 +63,19 @@ function job_table() {
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
-                title: 'Crontab',
+                title: 'Cron',
                 field: 'cron_string',
-                width: 90,
-                cellClick: (e, cell) => on_cell_click(cell)
+                width: 100,
+                cellClick: (e, cell) => on_cell_click(cell),
+                titleFormatter: (element) => {
+                    return `${element.getValue()}  <a href="#" onclick="get_help('cron_help_holder')">
+                            <span class="glyphicon glyphicon-question-sign"></span></a></label>`;
+                }
             },
             {
                 title: 'Command / Ipynb',
                 field: 'command_ipynb',
-                width: 300,
+                width: 260,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
@@ -113,19 +117,19 @@ function job_table() {
             {
                 title: 'Output',
                 field: 'output',
-                width: 200,
-                cellClick: (e, cell) => on_cell_click(cell)
+                width: 180,
+                cellClick: (e, cell) => on_cell_click(cell),
             },
             {
                 title: 'Start Date',
                 field: 'start_date',
-                width: 160,
+                width: 150,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {
                 title: 'End Date',
                 field: 'end_date',
-                width: 160,
+                width: 150,
                 cellClick: (e, cell) => on_cell_click(cell)
             },
             {

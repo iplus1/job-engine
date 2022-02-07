@@ -70,10 +70,13 @@ function control_job(action, id) {
         .then(error_handling)
         .then(response => response.text())
         .then(async function (response) {
-            if (action !== 'logs') {
+            if (action !== 'html_outputs') {
+                if (action === 'logs') {
+                    response = `<pre>${response}</pre>`;
+                }
                 display_after_control(response);
             } else {
-                await display_after_logs(response, id);
+                await display_after_html_outputs(response, id);
             }
         })
         .catch(function (error) {
@@ -138,8 +141,8 @@ async function update_table() {
  * Get a specific log file.
  *
  * @param id: Expects an integer with the id of the job.
- * @param log_file: Expects the name of the specific log file to get.
+ * @param html_output: Expects the name of the specific log file to get.
  */
-function get_log(id, log_file) {
-    window.open(`get_log?id=${id}&log_file=${encodeURIComponent(log_file)}`);
+function get_html_output(id, html_output) {
+    window.open(`get_html_output?id=${id}&html_output=${encodeURIComponent(html_output)}`);
 }

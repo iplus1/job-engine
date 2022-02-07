@@ -96,7 +96,7 @@ def get_backups(request):
         return HttpResponse(f'[{timezone.now()}] Server Error: {e}')
 
 
-def get_log(request):
+def get_html_output(request):
     """Return a specific log as HttpResponse.
 
     Fetches the entry of a specific job from the database by ID.
@@ -105,18 +105,18 @@ def get_log(request):
 
     :param request: Expected GET-Parameter:
         'id': int;
-        'log_file': string;
+        'html_output': string;
     :return: Requested Log file.
     :exception Exception if try fails. Printed to the terminal and returned as HttpResponse.:
     """
 
     try:
         job_id = request.GET["id"]
-        log_file = request.GET["log_file"]
+        html_output = request.GET["html_output"]
         job_entry = DBHelper.get_job_by_id(job_id)
         job = Job(name=job_entry.name, mode=job_entry.mode, cron_string=job_entry.cron_string,
                   command_ipynb=job_entry.command_ipynb, job_id=job_entry.id)
-        return HttpResponse(job.get_log(log_file))
+        return HttpResponse(job.get_html_output(html_output))
     except Exception as e:
         print(f'[{timezone.now()}] Server Error: {e}')
         return HttpResponse(f'[{timezone.now()}] Server Error: {e}')
@@ -176,7 +176,7 @@ def control_job(request):
 
     **Template:**
 
-    :template:`logs_selection.html`
+    :template:`html_outputs_selection.html`
 
     :param request: Expected JSON-attributes:
         'id': int;
@@ -185,7 +185,7 @@ def control_job(request):
         'name': string;
         'cron' string;
         'command-ipynb' string;
-    :return: Either the status of the perform_action() function or the logs_selection.html
+    :return: Either the status of the perform_action() function or the html_outputs_selection.html
     :exception Exception if try fails. Printed to the terminal and returned as HttpResponse.:
     """
 
@@ -194,9 +194,9 @@ def control_job(request):
         json_data = json.loads(raw_data)
         job_entry = DBHelper.get_job_by_id(json_data['id'])
 
-        if json_data['action'] == 'logs':
+        if json_data['action'] == 'html_outputs':
             context = ControlHelper(json_data, json_data['action']).perform_action()
-            return TemplateResponse(request, 'logs_selection.html', context)
+            return TemplateResponse(request, 'html_outputs_selection.html', context)
 
         elif json_data['action'] == 'edit':
             if ControlHelper.check_special_characters(json_data['job_name'].rstrip()):

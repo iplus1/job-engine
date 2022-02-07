@@ -11,6 +11,9 @@
             <div class="panel-heading">
                 <div class="job-table-header">
                     <span><button id="add_job-btn" class="btn btn-primary">+</button></span>
+                    <a href="#" onclick="get_help('overall_help_holder')" style="float: right; font-size: 30px">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </a>
                 </div>
             </div>
             <div id="job_table"></div>
@@ -56,7 +59,7 @@
                                 <label for="ipynb_file" class="control-label col-sm-3">Jupyter Notebook:</label>
                                 <div class="col-sm-6">
                                     <select name="ipynb_file" id="ipynb_file" size="1" class="form-control">
-                                        <option> -- select an ipynb --</option>
+                                        <option disabled> -- select an ipynb --</option>
                                         {% for nb in nbs %}
                                             <option>{{ nb }}</option>
                                         {% endfor %}
@@ -129,7 +132,7 @@
                             <label for="edit_mode" class="control-label col-sm-3">Mode Selection: <a href="#"
                                                                                                      onclick="get_help('mode_help_holder')"><span
                                     class="glyphicon glyphicon-question-sign"></span></a></label>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <input name="mode" id="edit_mode" class="form-control  mb-2 mr-sm-2 mb-sm-0" readonly>
                             </div>
                         </div>
@@ -137,7 +140,7 @@
                             <label for="edit_ipynb_file" class="control-label col-sm-3">Jupyter Notebook:</label>
                             <div class="col-sm-6">
                                 <select name="ipynb_file" id="edit_ipynb_file" size="1" class="form-control">
-                                    <option> -- select an ipynb --</option>
+                                    <option disabled> -- select an ipynb --</option>
                                     {% for nb in nbs %}
                                         <option>{{ nb }}</option>
                                     {% endfor %}
@@ -220,6 +223,22 @@
         </div>
     </div>
 
+    <!-- Help Overall -->
+    <div id="overall_help_holder" style="display:none;">
+        <pre>
+            <b>Table Structure:</b> Each cell, aside from the <b>Control Panel</b>, is clickable and will open an expanded view of its contents.
+                 This is especially helpful for the <b>Output</b> and <b>Command / Ipynb</b> column,
+                 since they are likely to contain more text than others.<br><br>
+
+<b>Cron Column:</b>     The cell in this column will remain empty if the selected mode for the job is not cron.<br><br>
+
+<b>Output Column:</b>   The cell in this column will only show the output of the current job iteration.
+                 If a new run starts the cell will be emptied and fill up with the new output.
+                 To see every output the job has generated click <input type="button" class="btn btn-info btn-xs" value="Logs"> in the control panel for the job.
+        </pre>
+    </div>
+
+
     <!-- Help Content Cron -->
     <div id="cron_help_holder" style="display:none;">
         There are two options for running a jupyter notebook:
@@ -282,6 +301,8 @@
         <pre>
  <input type="button" class="btn btn-info btn-xs" value="Edit">      : Open a window to edit a jobs information.
 
+ <input type="button" class="btn btn-info btn-xs" value="Logs">      : Request the content of the log file for the job.
+
  <input type="button" class="btn btn-danger btn-xs" value="Delete">    : Delete a job and every associated (Crontab, Directory, Process).
 
  <input type="button" class="btn btn-success btn-xs" value="Enable">    : Enable a Cron-Job, which effectively writes it to the Crontab.
@@ -292,13 +313,13 @@
 
  <input type="button" class="btn btn-warning btn-xs" value="Stop">      : Stop the execution of a job.
 
- <input type="button" class="btn btn-info btn-xs" value="Cleanup">   : Cleanup the job directory by deleting all logfiles.
+ <input type="button" class="btn btn-info btn-xs" value="Cleanup">   : Cleanup the job directory by deleting the html outputs, the logs file or both.
 
  <input type="button" class="btn btn-info btn-xs" value="Update">    : To make sure the user can still work on an ipynb while a job is running,
               the Jobengine uses a copy of the source script to execute for the job.
               The Update function updates the script the Job is using.
 
- <input type="button" class="btn btn-info btn-xs" value="Logs">      : Show all available log files of a job.
+ <input type="button" class="btn btn-info btn-xs" value="HTML">      : Show all available html-outputs of the ipynb job.
     </pre>
     </div>
 

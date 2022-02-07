@@ -79,7 +79,7 @@ function status_button(status) {
  *
  * Only show the start button for jobs with the 'mode' set to 'cmd'.
  * Only show the stop button for jobs that are currently running.
- * Only show the cleanup, update and logs button for ipynb-jobs.
+ * Only show the cleanup, update and html button for ipynb-jobs.
  *
  * @param data: Expects an object containing the data of a cell in the job-table.
  * @returns {string}: Contains all necessary buttons for a cell in the job-table.
@@ -98,11 +98,10 @@ function generate_control(data) {
         control_action_color = 'btn-success';
     }
 
-    let cleanup_btn = ``;
     let update_btn = ``;
-    let logs = ``;
     let start_stop_btn = ``;
     let enable_btn = ``;
+    let html_outputs = ``;
     if (data['mode'] === 'cmd' || data['mode'] === 'ipynb' || (data['mode'].includes('cron') && data['running'] === true)) {
         start_stop_btn = `<input type="button"  class="btn ${control_action_color} btn-xs" value="${control_action}" onclick="trigger_action('${control_action.toLowerCase()}','${data['id']}')"/>`;
     }
@@ -117,11 +116,12 @@ function generate_control(data) {
         enable_btn = `<input type="button"  class="btn ${control_action_enable_color} btn-xs" value="${control_action_enable}" onclick="trigger_action('${control_action_enable.toLocaleLowerCase()}','${data['id']}')"/> `;
     }
     if (data['mode'].includes('ipynb')) {
-        cleanup_btn = `<input type="button" class="btn btn-info btn-xs" value="Cleanup" onclick="trigger_action('cleanup','${data['id']}')"/>`;
         update_btn = `<input type="button" class="btn btn-info btn-xs" value="Update" onclick="trigger_action('update','${data['id']}')"/>`;
-        logs = `<input type="button" class="btn btn-info btn-xs" value="Logs" onclick="trigger_action('logs','${data['id']}')"/>`;
+        html_outputs = `<input type="button" class="btn btn-info btn-xs" value="HTML" onclick="trigger_action('html_outputs','${data['id']}')"/>`;
     }
+    const cleanup_btn = `<input type="button" class="btn btn-info btn-xs" value="Cleanup" onclick="trigger_action('cleanup','${data['id']}')"/>`;
     const delete_btn = `<input type="button" class="btn btn-danger btn-xs" value="Delete" onclick="trigger_action('delete','${data['id']}')"/>`;
     const edit_btn = `<input type="button" class="btn btn-info btn-xs" value="Edit" onclick="display_edit('${data['id']}')"/>`;
-    return `<span>${edit_btn} ${delete_btn} ${enable_btn} ${start_stop_btn} ${cleanup_btn} ${update_btn} ${logs}</span>`;
+    const logs = `<input type="button" class="btn btn-info btn-xs" value="Logs" onclick="trigger_action('logs','${data['id']}')"/>`;
+    return `<span>${edit_btn} ${logs} ${cleanup_btn} ${delete_btn} ${enable_btn} ${start_stop_btn} ${update_btn} ${html_outputs}</span>`;
 }

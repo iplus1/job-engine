@@ -48,11 +48,11 @@ class ControlHelper:
             elif self.action == 'stop':
                 return self.stop()
 
-            elif self.action == 'cleanup':
-                return self.cleanup()
-
             elif self.action == 'update':
                 return self.update()
+
+            elif self.action == 'html_outputs':
+                return self.html_outputs()
 
             elif self.action == 'logs':
                 return self.logs()
@@ -65,6 +65,9 @@ class ControlHelper:
 
             elif self.action == 'disable' and 'cron' in self.job.mode:
                 return self.disable()
+
+            elif 'cleanup' in self.action:
+                return self.cleanup()
 
         except Exception as e:
             print(f'[{timezone.now()}] Server Error: {e}')
@@ -139,7 +142,7 @@ class ControlHelper:
         :rtype: str
         """
 
-        return self.job.cleanup_job_dir()
+        return self.job.cleanup_job_dir(self.action)
 
     def update(self):
         """Update the ipynb file that the job uses for its execution.
@@ -155,13 +158,22 @@ class ControlHelper:
         return self.job.copy_ipynb_file()
 
     def logs(self):
-        """Return all log files of a job as a list.
+        """Return the logs file of a job as a list.
 
-        :return: All log files of the job.
-        :rtype: list
+        :return: The logs file of the job.
+        :rtype: string
         """
 
         return self.job.get_logs()
+
+    def html_outputs(self):
+        """Return all html-outputs of a job as a list.
+
+        :return: All html-outputs of the job.
+        :rtype: list
+        """
+
+        return self.job.get_html_outputs()
 
     def edit(self):
         """Edit the job with new parameters.

@@ -15,8 +15,7 @@ if [ ${number_occur} -ge 2 ]; then
     error "Skipping execution. Already running (found '${number_occur}' for '${PID}') ..."
 else
     bash -c "/var/www/jobengine/venv/bin/python /var/www/jobengine/manage.py update_status '${PID}' -1 'start'"
-    echo "Job Command: ${CMD_SEP}" > /jobengine/jobs/"${PID}"/last_output
+    info "Job Command: ${CMD_SEP}" > /jobengine/jobs/"${PID}"/last_output
     eval ${CMD} >> /jobengine/jobs/"${PID}"/last_output 2>&1
+    cat /jobengine/jobs/"${PID}"/last_output >> /jobengine/jobs/"${PID}"/logs
 fi
-
-
