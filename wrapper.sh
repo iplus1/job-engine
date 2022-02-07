@@ -18,5 +18,5 @@ else
     info "Job Command: ${CMD_SEP}" > /jobengine/jobs/"${PID}"/last_output
     eval ${CMD} >> /jobengine/jobs/"${PID}"/last_output 2>&1
     cat /jobengine/jobs/"${PID}"/last_output >> /jobengine/jobs/"${PID}"/logs
-				tail -n 500 logs > logs.tmp && mv logs.tmp logs
+				tail -n 500 /jobengine/jobs/"${PID}"/logs > /jobengine/jobs/"${PID}"/logs.tmp && mv /jobengine/jobs/"${PID}"/logs.tmp /jobengine/jobs/"${PID}"/logs
 fi
