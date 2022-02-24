@@ -3,7 +3,7 @@
 
 source /common
 
-export PATH="/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/jobengine/scripts"
+export PATH="/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/jobengine/runtime-scripts:/jobengine/startup-scripts"
 
 PID=$1
 CMD=$2

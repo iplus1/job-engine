@@ -6,14 +6,39 @@ source /common
 
 printenv > /etc/environment
 
+make_scripts_executable(){
+				info "Check if $1 directory is mounted..."
+				if [ -d /jobengine/$1/ ]; then
+        shopt -s nullglob dotglob
+        files=(/jobengine/$1/*)
+        if [ ${#files[@]} -gt 0 ]; then
+            chmod +x /jobengine/$1/*.sh
+            info "$1 directory should now be executable."
+        else
+            info "No scripts in the directory."
+        fi
+    else
+        info "No scripts directory mounted."
+    fi
+}
+
 DBDIR=/jobengine/db
 DBFILE=${DBDIR}/jobengine.sqlite3
+STARTUP_SCRIPTS=/jobengine/startup-scripts
 
 info "Check if Pre Conditions exist."
 if [ -f /pre_conditions.sh  ]; then
     info "Pre Conditions exist."
     /pre_conditions.sh
 fi
+
+make_scripts_executable "runtime-scripts"
+make_scripts_executable "startup-scripts"
+
+for script in $STARTUP_SCRIPTS/*.sh; do
+				info "Executing script: $script"
+    $script
+done
 
 mkdir -p ${DBDIR}
 
@@ -22,20 +47,6 @@ SECRET="$(pwgen 70 1 | tr -d '\n')"
 sed -i "s/^#SECRET_KEY = .*$/SECRET_KEY = '$SECRET'/" /var/www/jobengine/jobengine/settings.py
 
 sed -i "s#___DBFILE___#$DBFILE#" /var/www/jobengine/jobengine/settings.py
-
-info "Check if scripts directory is mounted..."
-if [ -d /jobengine/scripts/ ]; then
-    shopt -s nullglob dotglob
-    files=(/jobengine/scripts/*)
-    if [ ${#files[@]} -gt 0 ]; then
-        chmod +x /jobengine/scripts/*.sh
-        info "Scripts should now be executable."
-    else
-        info "No scripts in the directory."
-    fi
-else
-    info "No scripts directory mounted."
-fi
 
 cd /var/www/jobengine/
 
