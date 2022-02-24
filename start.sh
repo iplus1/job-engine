@@ -7,8 +7,8 @@ source /common
 printenv > /etc/environment
 
 make_scripts_executable(){
-				info "Check if $1 directory is mounted..."
-				if [ -d /jobengine/$1/ ]; then
+    info "Check if $1 directory is mounted..."
+    if [ -d /jobengine/$1/ ]; then
         shopt -s nullglob dotglob
         files=(/jobengine/$1/*)
         if [ ${#files[@]} -gt 0 ]; then
@@ -36,7 +36,7 @@ make_scripts_executable "runtime-scripts"
 make_scripts_executable "startup-scripts"
 
 for script in $STARTUP_SCRIPTS/*.sh; do
-				info "Executing script: $script"
+    info "Executing script: $script"
     $script
 done
 
