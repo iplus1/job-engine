@@ -10,10 +10,16 @@ make_scripts_executable(){
     info "Check if $1 directory is mounted..."
     if [ -d /jobengine/$1/ ]; then
         shopt -s nullglob dotglob
-        files=(/jobengine/$1/*)
+        files=(/jobengine/$1/*.sh)
         if [ ${#files[@]} -gt 0 ]; then
             chmod +x /jobengine/$1/*.sh
-            info "$1 directory should now be executable."
+            info "$1 in directory should now be executable."
+            if [ $1 == "startup-scripts" ]; then
+		for script in $STARTUP_SCRIPTS/*.sh; do
+                    info "Executing script: $script"
+                    $script
+                done
+            fi
         else
             info "No scripts in the directory."
         fi
@@ -34,11 +40,6 @@ fi
 
 make_scripts_executable "runtime-scripts"
 make_scripts_executable "startup-scripts"
-
-for script in $STARTUP_SCRIPTS/*.sh; do
-    info "Executing script: $script"
-    $script
-done
 
 mkdir -p ${DBDIR}
 
